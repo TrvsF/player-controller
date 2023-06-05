@@ -14,16 +14,16 @@
 
 #include "Camera/CameraComponent.h"
 
-#include "playercharacter.generated.h"
+#include "PlayerCharacter.generated.h"
 
 UCLASS()
-class PLAYERCONTROLLER_API Aplayercharacter : public ACharacter
+class PLAYERCONTROLLER_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this character's properties
-	Aplayercharacter();
+	APlayerCharacter();
 
 	void Jump() override;
 	virtual void StopJumping() override;

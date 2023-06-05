@@ -1,6 +1,6 @@
-#include "playercharacter.h"
+#include "PlayerCharacter.h"
 
-Aplayercharacter::Aplayercharacter()
+APlayerCharacter::APlayerCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -18,7 +18,7 @@ Aplayercharacter::Aplayercharacter()
 	BaseLookUpAtRate = 45.0f;
 }
 
-void Aplayercharacter::Jump()
+void APlayerCharacter::Jump()
 {
 	Super::Jump();
 	
@@ -29,18 +29,18 @@ void Aplayercharacter::Jump()
 	DrawDebugMessage("jump", FColor::Green, 1);
 }
 
-void Aplayercharacter::StopJumping()
+void APlayerCharacter::StopJumping()
 {
 	Super::StopJumping();
 }
 
-void Aplayercharacter::DrawDebugMessage(char* message, FColor colour, int id)
+void APlayerCharacter::DrawDebugMessage(char* message, FColor colour, int id)
 {
 	const auto& fstring = FString(message);
 	DrawDebugMessage(fstring, colour, id);
 }
 
-void Aplayercharacter::DrawDebugMessage(FString message, FColor colour, int id)
+void APlayerCharacter::DrawDebugMessage(FString message, FColor colour, int id)
 {
 	if (GEngine)
 	{
@@ -49,7 +49,7 @@ void Aplayercharacter::DrawDebugMessage(FString message, FColor colour, int id)
 }
 
 // Called when the game starts or when spawned
-void Aplayercharacter::BeginPlay()
+void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -57,7 +57,7 @@ void Aplayercharacter::BeginPlay()
 	DrawDebugMessage("spawned player", FColor::Green, -1);
 }
 
-void Aplayercharacter::MoveForward(float Value)
+void APlayerCharacter::MoveForward(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
@@ -69,7 +69,7 @@ void Aplayercharacter::MoveForward(float Value)
 	}
 }
 
-void Aplayercharacter::StrafeRight(float Value)
+void APlayerCharacter::StrafeRight(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
@@ -81,17 +81,17 @@ void Aplayercharacter::StrafeRight(float Value)
 	}
 }
 
-void Aplayercharacter::TurnAtRate(float Value)
+void APlayerCharacter::TurnAtRate(float Value)
 {
 	
 }
 
-void Aplayercharacter::LookUpAtRate(float Value)
+void APlayerCharacter::LookUpAtRate(float Value)
 {
 }
 
 // Called every frame
-void Aplayercharacter::Tick(float DeltaTime)
+void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
@@ -102,15 +102,15 @@ void Aplayercharacter::Tick(float DeltaTime)
 }
 
 // Called to bind functionality to input
-void Aplayercharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAction("Jump", IE_Pressed,  this, &Aplayercharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &Aplayercharacter::StopJumping);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed,  this, &APlayerCharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::StopJumping);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &Aplayercharacter::MoveForward);
-	PlayerInputComponent->BindAxis("StrafeRight", this, &Aplayercharacter::StrafeRight);
+	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("StrafeRight", this, &APlayerCharacter::StrafeRight);
 
 	PlayerInputComponent->BindAxis("Yaw",   this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Pitch", this, &APawn::AddControllerPitchInput);
