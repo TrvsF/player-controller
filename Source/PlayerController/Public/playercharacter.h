@@ -35,10 +35,7 @@ public:
 
 private:
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Camera")
-		USpringArmComponent* SpringArmComp;
-
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Camera")
-		UCameraComponent* CameraComp;
+		UCameraComponent* FirstPersonCameraComp;
 
 	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player")
 		UStaticMeshComponent* MeshComp;
@@ -61,13 +58,6 @@ protected:
 
 	void MoveForward (float Value);
 	void StrafeRight (float Value);
-	void TurnAtRate  (float Value);
-	void LookUpAtRate(float Value);
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
-	float BaseTurnRate;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Camera")
-	float BaseLookUpAtRate;
 
 public:	
 	// Called every frame

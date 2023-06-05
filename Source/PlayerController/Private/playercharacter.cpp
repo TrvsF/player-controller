@@ -5,17 +5,13 @@ APlayerCharacter::APlayerCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComp"));
-	SpringArmComp->SetupAttachment(RootComponent);
-
-	CameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComp"));
-	CameraComp->SetupAttachment(SpringArmComp);
-
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
 	MeshComp->SetupAttachment(RootComponent);
 
-	BaseTurnRate	 = 45.0f;
-	BaseLookUpAtRate = 45.0f;
+	FirstPersonCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
+	FirstPersonCameraComp->SetupAttachment(RootComponent);
+	FirstPersonCameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight));
+	FirstPersonCameraComp->bUsePawnControlRotation = true;
 }
 
 void APlayerCharacter::Jump()
@@ -81,24 +77,15 @@ void APlayerCharacter::StrafeRight(float Value)
 	}
 }
 
-void APlayerCharacter::TurnAtRate(float Value)
-{
-	
-}
-
-void APlayerCharacter::LookUpAtRate(float Value)
-{
-}
-
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	const FVector Velocity = GetMovementComponent()->Velocity;
-	const FVector Position = GetActorLocation();
-	DrawDebugMessage(Velocity.ToCompactString(), FColor::Black, 2);
-	DrawDebugMessage(Position.ToCompactString(), FColor::Black, 3);
+	const auto& VelocityStr = GetMovementComponent()->Velocity.ToCompactString();
+	const auto& PositionStr = GetActorLocation().ToCompactString();
+	DrawDebugMessage("vel:" + VelocityStr, FColor::Black, 2);
+	DrawDebugMessage("pos:" + PositionStr, FColor::Black, 3);
 }
 
 // Called to bind functionality to input
