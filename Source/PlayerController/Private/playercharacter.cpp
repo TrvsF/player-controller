@@ -5,13 +5,19 @@ APlayerCharacter::APlayerCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// mesh
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
 	MeshComp->SetupAttachment(RootComponent);
 
+	// camera
 	FirstPersonCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComp->SetupAttachment(RootComponent);
 	FirstPersonCameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight));
 	FirstPersonCameraComp->bUsePawnControlRotation = true;
+
+	// collsiion
+	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
+	CollisionBox->SetupAttachment(RootComponent);
 }
 
 void APlayerCharacter::Jump()
@@ -28,6 +34,18 @@ void APlayerCharacter::Jump()
 void APlayerCharacter::StopJumping()
 {
 	Super::StopJumping();
+}
+
+void APlayerCharacter::AddControllerYawInput(float Value)
+{
+	Value *= 0.38f;
+	Super::AddControllerYawInput(Value);
+}
+
+void APlayerCharacter::AddControllerPitchInput(float Value)
+{
+	Value *= 0.25f;
+	Super::AddControllerPitchInput(Value);
 }
 
 void APlayerCharacter::DrawDebugMessage(char* message, FColor colour, int id)
@@ -48,6 +66,17 @@ void APlayerCharacter::DrawDebugMessage(FString message, FColor colour, int id)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (CollisionBox)
+	{
+		CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); // Enable collision for the box
+
+		// Set collision response for the box
+		CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+		CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+		CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
+		// Add more collision channels and their responses if needed
+	}
 
 	// use strcat
 	DrawDebugMessage("spawned player", FColor::Green, -1);
@@ -99,7 +128,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("StrafeRight", this, &APlayerCharacter::StrafeRight);
 
-	PlayerInputComponent->BindAxis("Yaw",   this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("Pitch", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAxis("Yaw",   this, &APlayerCharacter::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Pitch", this, &APlayerCharacter::AddControllerPitchInput);
 }
 

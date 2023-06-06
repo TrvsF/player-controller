@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 
 #include "GameFramework/Character.h"
-#include "GameFramework/SpringArmComponent.h"
+
 #include "GameFramework/Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/InputComponent.h"
 
@@ -22,7 +23,6 @@ class PLAYERCONTROLLER_API APlayerCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	APlayerCharacter();
 
 	void Jump() override;
@@ -30,27 +30,21 @@ public:
 	// virtual void OnJumped_Implementation() override;
 	// virtual bool CanJumpInternal_Implementation() const override;
 
-	inline float GetLastJumpTime() const
-	{ return LastJumpTime; }
+	void AddControllerYawInput(float Value) override;
+	void AddControllerPitchInput(float Value) override;
 
 private:
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Camera")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* FirstPersonCameraComp;
 
-	UPROPERTY(VisibleAnywhere, meta = (AllowPrivateAccess = "true"), Category = "Player")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* MeshComp;
 
-	void DrawDebugMessage(char* message, FColor colour, int id);
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
+		UBoxComponent* CollisionBox;
+
+	void DrawDebugMessage(char* message,   FColor colour, int id);
 	void DrawDebugMessage(FString message, FColor colour, int id);
-
-	/** when we last jumped */
-	float LastJumpTime;
-
-	/** throttle jump boost when going up a ramp, so we don't spam it */
-	float LastJumpBoostTime;
-
-	/** maximum time it takes to jump */
-	float MaxJumpTime;
 
 protected:
 	// Called when the game starts or when spawned
