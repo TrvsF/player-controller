@@ -1,6 +1,7 @@
 #include "PlayerCharacter.h"
 
-APlayerCharacter::APlayerCharacter()
+APlayerCharacter::APlayerCharacter(const FObjectInitializer& objectInitializer)
+	: Super(objectInitializer.SetDefaultSubobjectClass<UPlayerMovement>(ACharacter::CharacterMovementComponentName))
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -18,15 +19,13 @@ APlayerCharacter::APlayerCharacter()
 	// collsiion
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->SetupAttachment(RootComponent);
+
+	MovementPtr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 }
 
 void APlayerCharacter::Jump()
 {
 	Super::Jump();
-	
-	FVector Facing = GetActorForwardVector();
-	FVector JumpBoostedVel = GetMovementComponent()->Velocity + Facing * 5000.0f;
-	GetMovementComponent()->Velocity = JumpBoostedVel;
 
 	DrawDebugMessage("jump", FColor::Green, 1);
 }
@@ -86,11 +85,7 @@ void APlayerCharacter::MoveForward(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		AddMovementInput(Direction, Value);
+		GetMovementComponent()->AddInputVector(GetActorForwardVector() * Value);
 	}
 }
 
@@ -98,11 +93,7 @@ void APlayerCharacter::StrafeRight(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		AddMovementInput(Direction, Value);
+		GetMovementComponent()->AddInputVector(GetActorRightVector() * Value);
 	}
 }
 
@@ -113,8 +104,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 	
 	const auto& VelocityStr = GetMovementComponent()->Velocity.ToCompactString();
 	const auto& PositionStr = GetActorLocation().ToCompactString();
-	DrawDebugMessage("vel:" + VelocityStr, FColor::Black, 2);
-	DrawDebugMessage("pos:" + PositionStr, FColor::Black, 3);
+	DrawDebugMessage("vel:" + VelocityStr, FColor::White, 2);
+	DrawDebugMessage("pos:" + PositionStr, FColor::White, 3);
 }
 
 // Called to bind functionality to input

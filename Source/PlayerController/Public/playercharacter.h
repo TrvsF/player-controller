@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 
-#include "GameFramework/Character.h"
+#include "PlayerMovement.h"
 
+#include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
-#include "GameFramework/CharacterMovementComponent.h"
 
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -17,13 +17,15 @@
 
 #include "PlayerCharacter.generated.h"
 
+class UPlayerMovement;
+
 UCLASS()
 class PLAYERCONTROLLER_API APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	APlayerCharacter();
+	APlayerCharacter(const FObjectInitializer& objectInitializer);
 
 	void Jump() override;
 	virtual void StopJumping() override;
@@ -34,14 +36,16 @@ public:
 	void AddControllerPitchInput(float Value) override;
 
 private:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Camera Comp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* FirstPersonCameraComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Player Comp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Player", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Player Comp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UBoxComponent* CollisionBox;
+
+	UPlayerMovement* MovementPtr;
 
 	void DrawDebugMessage(char* message,   FColor colour, int id);
 	void DrawDebugMessage(FString message, FColor colour, int id);
