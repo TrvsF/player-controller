@@ -3,24 +3,27 @@
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& objectInitializer)
 	: Super(objectInitializer.SetDefaultSubobjectClass<UPlayerMovement>(ACharacter::CharacterMovementComponentName))
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	// tick every frame
 	PrimaryActorTick.bCanEverTick = true;
-
-	// mesh
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
-	MeshComp->SetupAttachment(RootComponent);
 
 	// camera
 	FirstPersonCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComp->SetupAttachment(RootComponent);
 	FirstPersonCameraComp->SetRelativeLocation(FVector(0.0f, 0.0f, BaseEyeHeight));
 	FirstPersonCameraComp->bUsePawnControlRotation = true;
+	YawSensMultiplyer	= 0.4f;
+	PitchSensMultiplyer = 0.3f;
+
+	// player mesh
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
+	MeshComp->SetupAttachment(RootComponent);
 
 	// collsiion
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->SetupAttachment(RootComponent);
 	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
+	// movement
 	MovementPtr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 }
 
@@ -31,19 +34,28 @@ void APlayerCharacter::Jump()
 
 void APlayerCharacter::AddControllerYawInput(float Value)
 {
-	Value *= 0.38f;
+	Value *= YawSensMultiplyer;
 	Super::AddControllerYawInput(Value);
 }
 
 void APlayerCharacter::AddControllerPitchInput(float Value)
 {
-	Value *= 0.25f;
+	Value *= PitchSensMultiplyer;
 	Super::AddControllerPitchInput(Value);
+}
+
+void APlayerCharacter::DrawDebugMessage(char* message, bool boolean, int id)
+{
+	const auto& colour  = boolean ? FColor::Green : FColor::Red;
+	const auto& fstring = FString(message);
+
+	DrawDebugMessage(fstring, colour, id);
 }
 
 void APlayerCharacter::DrawDebugMessage(char* message, FColor colour, int id)
 {
 	const auto& fstring = FString(message);
+
 	DrawDebugMessage(fstring, colour, id);
 }
 
@@ -68,7 +80,7 @@ void APlayerCharacter::Move(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		GetMovementComponent()->AddInputVector(GetActorForwardVector() * Value);
+		AddMovementInput(GetActorRightVector(), Value);
 	}
 }
 
@@ -76,7 +88,7 @@ void APlayerCharacter::Strafe(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		GetMovementComponent()->AddInputVector(GetActorRightVector() * Value);
+		AddMovementInput(GetActorRightVector(), Value);
 	}
 }
 
@@ -85,10 +97,18 @@ void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	const auto& VelocityStr = GetMovementComponent()->Velocity.ToCompactString();
 	const auto& PositionStr = GetActorLocation().ToCompactString();
-	DrawDebugMessage("vel:" + VelocityStr, FColor::White, 2);
-	DrawDebugMessage("pos:" + PositionStr, FColor::White, 3);
+	const auto& VelocityStr = FString::SanitizeFloat(GetMovementComponent()->Velocity.Size());
+	const auto& AccelStr    = FString::SanitizeFloat(MovementPtr->GetCurrentAcceleration().Size());
+
+	DrawDebugMessage("pos:  " + PositionStr, FColor::White, 2);
+	DrawDebugMessage("vel:  " + VelocityStr, FColor::White, 3);
+	DrawDebugMessage("accel:" + VelocityStr, FColor::White, 4);
+
+	const auto& IsOnGround = MovementPtr->IsMovingOnGround();
+	DrawDebugMessage("onground", IsOnGround, 5);
+
+	
 }
 
 // Called to bind functionality to input
@@ -103,4 +123,24 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAxis("Yaw",   this, &APlayerCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Pitch", this, &APlayerCharacter::AddControllerPitchInput);
+}
+
+void APlayerCharacter::OnMovementModeChanged(EMovementMode prevMode, uint8 prevCustomMode)
+{
+	if (!bPressedJump) {
+		ResetJumpState();
+	}
+
+	if (MovementPtr->IsFalling() && bProxyIsJumpForceApplied) {
+		ProxyJumpForceStartedTime = GetWorld()->GetTimeSeconds();
+	}
+	else {
+		JumpCurrentCount = 0;
+		JumpKeyHoldTime = 0.f;
+		JumpForceTimeRemaining = 0.f;
+		bWasJumping = false;
+	}
+
+	K2_OnMovementModeChanged(prevMode, MovementPtr->MovementMode, prevCustomMode, MovementPtr->CustomMovementMode);
+	MovementModeChangedDelegate.Broadcast(this, prevMode, prevCustomMode);
 }

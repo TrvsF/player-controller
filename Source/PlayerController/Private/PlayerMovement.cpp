@@ -9,7 +9,7 @@ UPlayerMovement::UPlayerMovement()
     AirControlBoostVelocityThreshold = 0.f;
 
     // 450 Hammer units -> 857.25 unreal units
-    MaxAcceleration = 857.25f;
+    MaxAcceleration = 25.f;
 
     // walk speeds
     MaxWalkSpeed = 800.f;
@@ -33,9 +33,9 @@ UPlayerMovement::UPlayerMovement()
     BrakingDecelerationSwimming = 190.5f;
     BrakingDecelerationWalking = 190.5f;
 
-    MaxStepHeight = 34.29f;
+    MaxStepHeight = 30.f;
 
-    JumpZVelocity = 304.8f;
+    JumpZVelocity = 300.f;
     JumpOffJumpZFactor = 1.f;
 
     bCanWalkOffLedgesWhenCrouching = true;
@@ -136,11 +136,11 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
     if (bForceMaxAccel)
 	{
         if (Acceleration.SizeSquared() > SMALL_NUMBER)
-	{
+	    {
             Acceleration = Acceleration.GetSafeNormal() * maxAccel;
         }
         else
-	{
+	    {
             Acceleration = maxAccel * (Velocity.SizeSquared() < SMALL_NUMBER ? UpdatedComponent->GetForwardVector() : Velocity.GetSafeNormal());
         }
 
@@ -169,7 +169,7 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
     if (bCheatFlying)
 	{
         if (bZeroAccel)
-	{
+	    {
             Velocity = FVector::ZeroVector;
             return;
         }
@@ -201,7 +201,7 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
         const float addSpeed = (bIsGroundMove ? Acceleration : Acceleration.GetClampedToMaxSize2D(AirSpeedCap)).Size2D() - veer;
 
         if (addSpeed > 0.f)
-	{
+	    {
             float accelMult = bIsGroundMove ? GroundAcceleration : AirAcceleration;
 
             Acceleration *= accelMult * delta;
@@ -217,10 +217,7 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
     }
 
     // Surfing
-    PreemptCollision(delta);
-
-    // Cap
-    Velocity = Velocity.GetClampedToMaxSize2D(13470.4f);
+    // PreemptCollision(delta);
 
     bLastGrounded = bIsGrounded;
 }

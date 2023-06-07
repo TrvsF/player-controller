@@ -27,37 +27,41 @@ class PLAYERCONTROLLER_API APlayerCharacter : public ACharacter
 public:
 	APlayerCharacter(const FObjectInitializer& objectInitializer);
 
-	void AddControllerYawInput(float Value) override;
-	void AddControllerPitchInput(float Value) override;
-
 private:
-	UPROPERTY(Category = "Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* FirstPersonCameraComp;
 
-	UPROPERTY(Category = "Player", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
+		float YawSensMultiplyer;
+
+	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
+		float PitchSensMultiplyer;
+
+	UPROPERTY(Category = "Player Mesh", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(Category = "Player", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Player Collision", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UBoxComponent* CollisionBox;
 
 	UPlayerMovement* MovementPtr;
 
+	void DrawDebugMessage(char* message,   bool boolean, int id);
 	void DrawDebugMessage(char* message,   FColor colour, int id);
 	void DrawDebugMessage(FString message, FColor colour, int id);
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void Jump() override;
-	void Move   (float Value);
-	void Strafe (float Value);
+	void Move  (float Value);
+	void Strafe(float Value);
+
+	void AddControllerYawInput  (float Value) override;
+	void AddControllerPitchInput(float Value) override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void OnMovementModeChanged(EMovementMode prevMode, uint8 prevCustomMode) override;
 };
