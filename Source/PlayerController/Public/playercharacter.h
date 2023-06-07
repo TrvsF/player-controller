@@ -27,22 +27,17 @@ class PLAYERCONTROLLER_API APlayerCharacter : public ACharacter
 public:
 	APlayerCharacter(const FObjectInitializer& objectInitializer);
 
-	void Jump() override;
-	virtual void StopJumping() override;
-	// virtual void OnJumped_Implementation() override;
-	// virtual bool CanJumpInternal_Implementation() const override;
-
 	void AddControllerYawInput(float Value) override;
 	void AddControllerPitchInput(float Value) override;
 
 private:
-	UPROPERTY(Category = "Camera Comp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* FirstPersonCameraComp;
 
-	UPROPERTY(Category = "Player Comp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Player", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* MeshComp;
 
-	UPROPERTY(Category = "Player Comp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Player", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UBoxComponent* CollisionBox;
 
 	UPlayerMovement* MovementPtr;
@@ -54,8 +49,9 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void MoveForward (float Value);
-	void StrafeRight (float Value);
+	void Jump() override;
+	void Move   (float Value);
+	void Strafe (float Value);
 
 public:	
 	// Called every frame

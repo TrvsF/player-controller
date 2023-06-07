@@ -69,7 +69,8 @@ UPlayerMovement::UPlayerMovement()
 
 void UPlayerMovement::PreemptCollision(float delta)
 {
-    if (Velocity.IsNearlyZero() || IsMovingOnGround()) {
+    if (Velocity.IsNearlyZero() || IsMovingOnGround())
+	{
         return;
     }
 
@@ -86,7 +87,8 @@ void UPlayerMovement::PreemptCollision(float delta)
     GetWorld()->LineTraceSingleByChannel(hitResult, start, end, UpdatedComponent->GetCollisionObjectType(),
         FCollisionQueryParams(FName(TEXT("SurfTrace")), true, GetCharacterOwner()));
 
-    if (!hitResult.bBlockingHit || hitResult.ImpactNormal.Z >= GetWalkableFloorZ()) {
+    if (!hitResult.bBlockingHit || hitResult.ImpactNormal.Z >= GetWalkableFloorZ())
+	{
         return;
     }
 
@@ -100,8 +102,8 @@ void UPlayerMovement::PreemptCollision(float delta)
 
     float speed = Velocity.SizeSquared2D();
 
-    // Using Squared is more efficient, Sqrt is expensive (only when we have to)
-    if ((collisionVec.Z * collisionVec.Z) > speed) {
+    if (collisionVec.Z * collisionVec.Z > speed)
+	{
         collisionVec.Z = FMath::Sqrt(speed);
     }
 
@@ -110,7 +112,8 @@ void UPlayerMovement::PreemptCollision(float delta)
 
 void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, float brakingDeceleration)
 {
-    if (!HasValidData() || HasAnimRootMotion() || delta < MIN_TICK_TIME || (CharacterOwner && CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy)) {
+    if (!HasValidData() || HasAnimRootMotion() || delta < MIN_TICK_TIME || (CharacterOwner && CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy))
+	{
         return;
     }
 
@@ -124,16 +127,20 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
     FVector requestedAccel = FVector::ZeroVector;
 
     bool reqMove = ApplyRequestedMove(delta, maxAccel, maxSpeed, friction, brakingDeceleration, requestedAccel, requestedSpeed);
-    if (reqMove) {
+    if (reqMove)
+	{
         requestedAccel = requestedAccel.GetClampedToMaxSize(maxAccel);
         bZeroRequestedAccel = false;
     }
 
-    if (bForceMaxAccel) {
-        if (Acceleration.SizeSquared() > SMALL_NUMBER) {
+    if (bForceMaxAccel)
+	{
+        if (Acceleration.SizeSquared() > SMALL_NUMBER)
+	{
             Acceleration = Acceleration.GetSafeNormal() * maxAccel;
         }
-        else {
+        else
+	{
             Acceleration = maxAccel * (Velocity.SizeSquared() < SMALL_NUMBER ? UpdatedComponent->GetForwardVector() : Velocity.GetSafeNormal());
         }
 
@@ -148,17 +155,21 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
     const bool bIsGroundMove = bIsGrounded && bLastGrounded;
 
     // Apply friction only if they are grounded
-    if (bIsGroundMove) {
+    if (bIsGroundMove)
+	{
         const float actualBrakingFriction = bUseSeparateBrakingFriction ? BrakingFriction : friction;
         ApplyVelocityBraking(delta, actualBrakingFriction, brakingDeceleration);
     }
 
-    if (bFluid) {
+    if (bFluid)
+	{
         Velocity *= 1.f - FMath::Min(friction * delta, 1.f);
     }
 
-    if (bCheatFlying) {
-        if (bZeroAccel) {
+    if (bCheatFlying)
+	{
+        if (bZeroAccel)
+	{
             Velocity = FVector::ZeroVector;
             return;
         }
@@ -179,7 +190,8 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
         return;
     }
 
-    if (!bZeroAccel) {
+    if (!bZeroAccel)
+	{
         Acceleration = Acceleration.GetClampedToMaxSize2D(maxSpeed);
 
         const FVector accelDir = Acceleration.GetSafeNormal2D();
@@ -188,7 +200,8 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
         const float veer = Velocity.X * accelDir.X + Velocity.Y * accelDir.Y;
         const float addSpeed = (bIsGroundMove ? Acceleration : Acceleration.GetClampedToMaxSize2D(AirSpeedCap)).Size2D() - veer;
 
-        if (addSpeed > 0.f) {
+        if (addSpeed > 0.f)
+	{
             float accelMult = bIsGroundMove ? GroundAcceleration : AirAcceleration;
 
             Acceleration *= accelMult * delta;
@@ -198,7 +211,8 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
         }
     }
 
-    if (!bZeroRequestedAccel) {
+    if (!bZeroRequestedAccel)
+	{
         Velocity += requestedAccel * delta;
     }
 
@@ -215,14 +229,16 @@ void UPlayerMovement::ApplyVelocityBraking(float delta, float friction, float br
 {
     float speed = Velocity.Size2D();
 
-    if (speed <= 0.1f || !HasValidData() || HasAnimRootMotion() || delta < MIN_TICK_TIME) {
+    if (speed <= 0.1f || !HasValidData() || HasAnimRootMotion() || delta < MIN_TICK_TIME)
+	{
         return;
     }
 
     friction *= BrakingFrictionFactor;
     brakingDeceleration = FMath::Max(brakingDeceleration, speed);
 
-    if (FMath::IsNearlyZero(friction) || FMath::IsNearlyZero(brakingDeceleration)) {
+    if (FMath::IsNearlyZero(friction) || FMath::IsNearlyZero(brakingDeceleration))
+	{
         return;
     }
 
@@ -231,7 +247,8 @@ void UPlayerMovement::ApplyVelocityBraking(float delta, float friction, float br
 
     Velocity -= revAccel * delta;
 
-    if ((Velocity | oldVel) <= 0.f || FMath::IsNearlyZero(Velocity.SizeSquared(), KINDA_SMALL_NUMBER)) {
+    if ((Velocity | oldVel) <= 0.f || FMath::IsNearlyZero(Velocity.SizeSquared(), KINDA_SMALL_NUMBER))
+	{
         Velocity = FVector::ZeroVector;
     }
 }
@@ -271,7 +288,7 @@ float UPlayerMovement::SlideAlongSurface(const FVector& delta, float time, const
 
 float UPlayerMovement::GetMaxSpeed() const
 {
-    if ((IsWalking() || IsFalling() || bCheatFlying) && IsCrouching()) {
+    if ((IsWalking() || IsFalling() || bCheatFlying) && IsCrouching()){
         return WalkSpeed;
     }
 

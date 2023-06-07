@@ -19,20 +19,14 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& objectInitializer)
 	// collsiion
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	CollisionBox->SetupAttachment(RootComponent);
+	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	MovementPtr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 }
 
 void APlayerCharacter::Jump()
 {
-	Super::Jump();
-
-	DrawDebugMessage("jump", FColor::Green, 1);
-}
-
-void APlayerCharacter::StopJumping()
-{
-	Super::StopJumping();
+	MovementPtr->DoJump(false);
 }
 
 void APlayerCharacter::AddControllerYawInput(float Value)
@@ -66,22 +60,11 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (CollisionBox)
-	{
-		CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); // Enable collision for the box
-
-		// Set collision response for the box
-		CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
-		CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
-		CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Block);
-		// Add more collision channels and their responses if needed
-	}
-
 	// use strcat
 	DrawDebugMessage("spawned player", FColor::Green, -1);
 }
 
-void APlayerCharacter::MoveForward(float Value)
+void APlayerCharacter::Move(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
@@ -89,7 +72,7 @@ void APlayerCharacter::MoveForward(float Value)
 	}
 }
 
-void APlayerCharacter::StrafeRight(float Value)
+void APlayerCharacter::Strafe(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
@@ -114,12 +97,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed,  this, &APlayerCharacter::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &APlayerCharacter::StopJumping);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("StrafeRight", this, &APlayerCharacter::StrafeRight);
+	
+	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::Move);
+	PlayerInputComponent->BindAxis("StrafeRight", this, &APlayerCharacter::Strafe);
 
 	PlayerInputComponent->BindAxis("Yaw",   this, &APlayerCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Pitch", this, &APlayerCharacter::AddControllerPitchInput);
 }
-
