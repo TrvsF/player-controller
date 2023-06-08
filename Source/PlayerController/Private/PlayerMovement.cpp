@@ -112,18 +112,38 @@ void UPlayerMovement::PreemptCollision(float delta)
 
 void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, float brakingDeceleration)
 {
+    // validate
     if (!HasValidData() || HasAnimRootMotion() || delta < MIN_TICK_TIME || (CharacterOwner && CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy))
 	{
         return;
     }
 
+    // firction
     friction = FMath::Max(0.f, friction);
+    if (IsMovingOnGround() && WishDir == FVector::Zero())
+    {
+        const float actualBrakingFriction = bUseSeparateBrakingFriction ? BrakingFriction : friction;
+        ApplyVelocityBraking(delta, actualBrakingFriction, brakingDeceleration);
+    }
 
+    const float MaxVelocity  = IsMovingOnGround() ? 800.f : 1500.f;
+    const float WishVelocity = 50.f;
+
+    // accel
+    const float CurrentVelocity = FVector::DotProduct(Velocity, WishDir);
+    const FVector AddVelocity   = FVector{ MaxVelocity, MaxVelocity, 0 } - Velocity;
+
+    Velocity += WishDir * WishVelocity;
+    Velocity = Velocity.GetClampedToMaxSize(800.f);
+
+    WishDir = FVector::Zero();
+
+    /*
     const float maxAccel = GetMaxAcceleration();
     float maxSpeed = GetMaxSpeed();
 
-    bool bZeroRequestedAccel = true;
-    float requestedSpeed = 0.f;
+    bool    bZeroRequestedAccel = true;
+    float   requestedSpeed = 0.f;
     FVector requestedAccel = FVector::ZeroVector;
 
     bool reqMove = ApplyRequestedMove(delta, maxAccel, maxSpeed, friction, brakingDeceleration, requestedAccel, requestedSpeed);
@@ -132,6 +152,9 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
         requestedAccel = requestedAccel.GetClampedToMaxSize(maxAccel);
         bZeroRequestedAccel = false;
     }
+
+    OnScreenDebugger::DrawDebugMessage(FString::SanitizeFloat(requestedSpeed), FColor::Green, 100);
+    OnScreenDebugger::DrawDebugMessage(FString::SanitizeFloat(requestedAccel.Size()), FColor::Green, 101);
 
     if (bForceMaxAccel)
 	{
@@ -179,7 +202,7 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
 
         lookVec2D.Z = 0.f;
 
-        FVector perpendicularAccel = (lookVec2D | Acceleration) * lookVec2D; // Dot product
+        FVector perpendicularAccel = (lookVec2D | Acceleration) * lookVec2D;
         FVector tangentialAccel = Acceleration - perpendicularAccel;
         FVector unitAccel = Acceleration;
 
@@ -218,8 +241,9 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
 
     // Surfing
     // PreemptCollision(delta);
+    */
 
-    bLastGrounded = bIsGrounded;
+    // bLastGrounded = bIsGrounded;
 }
 
 void UPlayerMovement::ApplyVelocityBraking(float delta, float friction, float brakingDeceleration)

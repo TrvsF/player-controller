@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "PlayerMovement.h"
+#include "OnScreenDebugger.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
@@ -44,10 +45,6 @@ private:
 		UBoxComponent* CollisionBox;
 
 	UPlayerMovement* MovementPtr;
-
-	void DrawDebugMessage(char* message,   bool boolean, int id);
-	void DrawDebugMessage(char* message,   FColor colour, int id);
-	void DrawDebugMessage(FString message, FColor colour, int id);
 
 protected:
 	virtual void BeginPlay() override;

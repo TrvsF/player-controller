@@ -2,6 +2,8 @@
 
 #include "CoreMinimal.h"
 
+#include "OnScreenDebugger.h"
+
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -38,6 +40,8 @@ private:
 	bool bLastGrounded = false;
 
 public:
+	FVector WishDir;
+
 	void CalcVelocity(float delta, float friction, bool bFluid, float brakingDeceleration) override;
 	void ApplyVelocityBraking(float delta, float friction, float brakingDeceleration) override;
 

@@ -44,43 +44,20 @@ void APlayerCharacter::AddControllerPitchInput(float Value)
 	Super::AddControllerPitchInput(Value);
 }
 
-void APlayerCharacter::DrawDebugMessage(char* message, bool boolean, int id)
-{
-	const auto& colour  = boolean ? FColor::Green : FColor::Red;
-	const auto& fstring = FString(message);
-
-	DrawDebugMessage(fstring, colour, id);
-}
-
-void APlayerCharacter::DrawDebugMessage(char* message, FColor colour, int id)
-{
-	const auto& fstring = FString(message);
-
-	DrawDebugMessage(fstring, colour, id);
-}
-
-void APlayerCharacter::DrawDebugMessage(FString message, FColor colour, int id)
-{
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(id, 4.0f, colour, message);
-	}
-}
-
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// use strcat
-	DrawDebugMessage("spawned player", FColor::Green, -1);
+	OnScreenDebugger::DrawDebugMessage("spawned player", FColor::Green, -1);
 }
 
 void APlayerCharacter::Move(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		AddMovementInput(GetActorRightVector(), Value);
+		MovementPtr->WishDir = GetActorForwardVector() * Value;
+		// AddMovementInput(GetActorForwardVector(), Value);
 	}
 }
 
@@ -88,7 +65,8 @@ void APlayerCharacter::Strafe(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		AddMovementInput(GetActorRightVector(), Value);
+		MovementPtr->WishDir = GetActorRightVector() * Value;
+		// AddMovementInput(GetActorRightVector(), Value);
 	}
 }
 
@@ -101,14 +79,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 	const auto& VelocityStr = FString::SanitizeFloat(GetMovementComponent()->Velocity.Size());
 	const auto& AccelStr    = FString::SanitizeFloat(MovementPtr->GetCurrentAcceleration().Size());
 
-	DrawDebugMessage("pos:  " + PositionStr, FColor::White, 2);
-	DrawDebugMessage("vel:  " + VelocityStr, FColor::White, 3);
-	DrawDebugMessage("accel:" + VelocityStr, FColor::White, 4);
+	OnScreenDebugger::DrawDebugMessage("pos:  " + PositionStr, FColor::White, 2);
+	OnScreenDebugger::DrawDebugMessage("vel:  " + VelocityStr, FColor::White, 3);
+	OnScreenDebugger::DrawDebugMessage("accel:" + VelocityStr, FColor::White, 4);
 
 	const auto& IsOnGround = MovementPtr->IsMovingOnGround();
-	DrawDebugMessage("onground", IsOnGround, 5);
-
-	
+	OnScreenDebugger::DrawDebugMessage("onground", IsOnGround, 5);
 }
 
 // Called to bind functionality to input
