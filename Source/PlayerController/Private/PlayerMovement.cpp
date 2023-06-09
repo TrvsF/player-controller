@@ -2,112 +2,19 @@
 
 UPlayerMovement::UPlayerMovement()
 {
-    // We are handling air control.. so
-    AirControl = 1.f;
+    m_maxwalkspeed = 800.f;
+    m_maxairspeed = 1500.f;
+    m_accelerationspeed = 400000.f;
 
-    AirControlBoostMultiplier = 1.f;
-    AirControlBoostVelocityThreshold = 0.f;
-
-    // 450 Hammer units -> 857.25 unreal units
-    MaxAcceleration = 25.f;
-
-    // walk speeds
-    MaxWalkSpeed = 800.f;
-    WalkSpeed    = 800.f;
-
-    GroundAcceleration = 100.f; // Default ground acceleration
-    AirAcceleration = 10000.f; // Higher air control allowed in movement-skill games
-
-    AirSpeedCap = 50.f;
-
-    GroundFriction = 4.f;
-    BrakingFriction = 4.f;
-    bUseSeparateBrakingFriction = false;
-
-    BrakingFrictionFactor = 1.f;
-
-    FallingLateralFriction = 0.f;
-
-    BrakingDecelerationFalling = 0.f; // No air friction
-    BrakingDecelerationFlying = 190.5f;
-    BrakingDecelerationSwimming = 190.5f;
-    BrakingDecelerationWalking = 190.5f;
-
-    MaxStepHeight = 30.f;
-
-    JumpZVelocity = 300.f;
-    JumpOffJumpZFactor = 1.f;
-
-    bCanWalkOffLedgesWhenCrouching = true;
-
-    // 45 degrees
-    SetWalkableFloorZ(0.7f);
-
-    StandingDownwardForceScale = 1.f;
-
-    InitialPushForceFactor = 100.f;
-    PushForceFactor = 500.f;
-
-    RepulsionForce = 0.f;
-    MaxTouchForce = 0.f;
-    TouchForceFactor = 0.f;
-
-    bPushForceUsingZOffset = false;
-    PushForcePointZOffsetFactor = -0.66f;
-
-    bScalePushForceToVelocity = true;
-
-    bPushForceScaledToMass = false;
-    bTouchForceScaledToMass = false;
-
-    Mass = 65.f;
-
-    bUseControllerDesiredRotation = false;
-    bUseFlatBaseForFloorChecks = true;
-	
+    m_maxwalkspeedvec = FVector{ m_maxwalkspeed, m_maxwalkspeed, 0 };
+    m_maxairspeedvec  = FVector{ m_maxwalkspeed, m_maxwalkspeed, 0 };
 }
 
-void UPlayerMovement::PreemptCollision(float delta)
+void UPlayerMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-    if (Velocity.IsNearlyZero() || IsMovingOnGround())
-	{
-        return;
-    }
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-    float floorSweepTraceDist = MaxStepHeight + MAX_FLOOR_DIST + KINDA_SMALL_NUMBER;
-
-    UCapsuleComponent* capsuleComponent = GetCharacterOwner()->GetCapsuleComponent();
-
-    FHitResult hitResult;
-
-    FVector offset = FVector(0.f, 0.f, capsuleComponent->GetScaledCapsuleHalfHeight());
-    FVector start = capsuleComponent->GetComponentLocation() - offset;
-    FVector end = start - FVector(0.f, 0.f, floorSweepTraceDist);
-
-    GetWorld()->LineTraceSingleByChannel(hitResult, start, end, UpdatedComponent->GetCollisionObjectType(),
-        FCollisionQueryParams(FName(TEXT("SurfTrace")), true, GetCharacterOwner()));
-
-    if (!hitResult.bBlockingHit || hitResult.ImpactNormal.Z >= GetWalkableFloorZ())
-	{
-        return;
-    }
-
-    FVector movementVec = Velocity + (capsuleComponent->GetPhysicsLinearVelocity().Z + GetGravityZ() * delta * (1.f - hitResult.ImpactNormal.Z));
-    FVector collisionVec = hitResult.ImpactNormal;
-
-    collisionVec *= -1 * (movementVec | hitResult.ImpactNormal);
-
-    collisionVec.X = 0.f;
-    collisionVec.Y = 0.f;
-
-    float speed = Velocity.SizeSquared2D();
-
-    if (collisionVec.Z * collisionVec.Z > speed)
-	{
-        collisionVec.Z = FMath::Sqrt(speed);
-    }
-
-    AddImpulse(collisionVec, true);
+    CalcVelocity(DeltaTime, GetMaxBrakingDeceleration(), false, false);
 }
 
 void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, float brakingDeceleration)
@@ -118,132 +25,33 @@ void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, flo
         return;
     }
 
+    // setup vars
+    bool ismovingonground = IsMovingOnGround();
+
     // firction
     friction = FMath::Max(0.f, friction);
-    if (IsMovingOnGround() && WishDir == FVector::Zero())
+    if (ismovingonground && GetWishDir() == FVector::Zero())
     {
         const float actualBrakingFriction = bUseSeparateBrakingFriction ? BrakingFriction : friction;
         ApplyVelocityBraking(delta, actualBrakingFriction, brakingDeceleration);
     }
 
-    const float MaxVelocity  = IsMovingOnGround() ? 800.f : 1500.f;
-    const float WishVelocity = 50.f;
+    const auto& current_speed = FVector::DotProduct(Velocity, GetWishDir());
+    const auto& add_speed = FMath::Clamp(m_maxwalkspeed - current_speed, 0, m_accelerationspeed * delta);
+    
+    Velocity += GetWishDir() * add_speed;
 
-    // accel
-    const float CurrentVelocity = FVector::DotProduct(Velocity, WishDir);
-    const FVector AddVelocity   = FVector{ MaxVelocity, MaxVelocity, 0 } - Velocity;
+    const auto& WishDirStr = GetWishDir().ToString();
+    OnScreenDebugger::DrawDebugMessage("wish:  " + WishDirStr, FColor::White, 6);
 
-    Velocity += WishDir * WishVelocity;
-    Velocity = Velocity.GetClampedToMaxSize(800.f);
+    const auto& CurrentSpeedStr = FString::SanitizeFloat(current_speed);
+    OnScreenDebugger::DrawDebugMessage("current speed:  " + CurrentSpeedStr, FColor::White, 7);
 
-    WishDir = FVector::Zero();
+    const auto& AddSpeedStr = FString::SanitizeFloat(add_speed);
+    OnScreenDebugger::DrawDebugMessage("add speed:  " + AddSpeedStr, FColor::White, 8);
 
-    /*
-    const float maxAccel = GetMaxAcceleration();
-    float maxSpeed = GetMaxSpeed();
-
-    bool    bZeroRequestedAccel = true;
-    float   requestedSpeed = 0.f;
-    FVector requestedAccel = FVector::ZeroVector;
-
-    bool reqMove = ApplyRequestedMove(delta, maxAccel, maxSpeed, friction, brakingDeceleration, requestedAccel, requestedSpeed);
-    if (reqMove)
-	{
-        requestedAccel = requestedAccel.GetClampedToMaxSize(maxAccel);
-        bZeroRequestedAccel = false;
-    }
-
-    OnScreenDebugger::DrawDebugMessage(FString::SanitizeFloat(requestedSpeed), FColor::Green, 100);
-    OnScreenDebugger::DrawDebugMessage(FString::SanitizeFloat(requestedAccel.Size()), FColor::Green, 101);
-
-    if (bForceMaxAccel)
-	{
-        if (Acceleration.SizeSquared() > SMALL_NUMBER)
-	    {
-            Acceleration = Acceleration.GetSafeNormal() * maxAccel;
-        }
-        else
-	    {
-            Acceleration = maxAccel * (Velocity.SizeSquared() < SMALL_NUMBER ? UpdatedComponent->GetForwardVector() : Velocity.GetSafeNormal());
-        }
-
-        AnalogInputModifier = 1.f;
-    }
-
-    const float maxInputSpeed = FMath::Max(maxSpeed * AnalogInputModifier, GetMinAnalogSpeed());
-    maxSpeed = FMath::Max(requestedSpeed, maxInputSpeed);
-
-    const bool bZeroAccel = Acceleration.IsNearlyZero();
-    const bool bIsGrounded = IsMovingOnGround();
-    const bool bIsGroundMove = bIsGrounded && bLastGrounded;
-
-    // Apply friction only if they are grounded
-    if (bIsGroundMove)
-	{
-        const float actualBrakingFriction = bUseSeparateBrakingFriction ? BrakingFriction : friction;
-        ApplyVelocityBraking(delta, actualBrakingFriction, brakingDeceleration);
-    }
-
-    if (bFluid)
-	{
-        Velocity *= 1.f - FMath::Min(friction * delta, 1.f);
-    }
-
-    if (bCheatFlying)
-	{
-        if (bZeroAccel)
-	    {
-            Velocity = FVector::ZeroVector;
-            return;
-        }
-
-        FVector lookVec = CharacterOwner->GetControlRotation().Vector();
-        FVector lookVec2D = CharacterOwner->GetActorForwardVector();
-
-        lookVec2D.Z = 0.f;
-
-        FVector perpendicularAccel = (lookVec2D | Acceleration) * lookVec2D;
-        FVector tangentialAccel = Acceleration - perpendicularAccel;
-        FVector unitAccel = Acceleration;
-
-        float lookAng = unitAccel.CosineAngle2D(lookVec);
-        FVector product = lookAng * lookVec * perpendicularAccel.Size2D() + tangentialAccel;
-
-        Velocity = product.GetClampedToSize(MaxAcceleration, MaxAcceleration);
-        return;
-    }
-
-    if (!bZeroAccel)
-	{
-        Acceleration = Acceleration.GetClampedToMaxSize2D(maxSpeed);
-
-        const FVector accelDir = Acceleration.GetSafeNormal2D();
-
-        // Strafe movementtttt
-        const float veer = Velocity.X * accelDir.X + Velocity.Y * accelDir.Y;
-        const float addSpeed = (bIsGroundMove ? Acceleration : Acceleration.GetClampedToMaxSize2D(AirSpeedCap)).Size2D() - veer;
-
-        if (addSpeed > 0.f)
-	    {
-            float accelMult = bIsGroundMove ? GroundAcceleration : AirAcceleration;
-
-            Acceleration *= accelMult * delta;
-            Acceleration = Acceleration.GetClampedToMaxSize2D(addSpeed);
-
-            Velocity += Acceleration;
-        }
-    }
-
-    if (!bZeroRequestedAccel)
-	{
-        Velocity += requestedAccel * delta;
-    }
-
-    // Surfing
-    // PreemptCollision(delta);
-    */
-
-    // bLastGrounded = bIsGrounded;
+    m_fwdvalue = 0;
+    m_rgtvalue = 0;
 }
 
 void UPlayerMovement::ApplyVelocityBraking(float delta, float friction, float brakingDeceleration)
@@ -292,7 +100,7 @@ FVector UPlayerMovement::HandleSlopeBoosting(const FVector& slideResult, const F
 bool UPlayerMovement::ShouldCatchAir(const FFindFloorResult& oldFloor, const FFindFloorResult& newFloor)
 {
     float speed = Velocity.Size2D();
-    float maxSpeed = WalkSpeed * 1.5f;
+    float maxSpeed = m_maxwalkspeed *1.5f;
 
     float speedMult = maxSpeed / speed;
     float nrmDiff = newFloor.HitResult.ImpactNormal.Z - oldFloor.HitResult.ImpactNormal.Z;
@@ -309,9 +117,5 @@ float UPlayerMovement::SlideAlongSurface(const FVector& delta, float time, const
 
 float UPlayerMovement::GetMaxSpeed() const
 {
-    if ((IsWalking() || IsFalling() || bCheatFlying) && IsCrouching()){
-        return WalkSpeed;
-    }
-
-    return Super::GetMaxSpeed();
+    return m_maxwalkspeed;
 }

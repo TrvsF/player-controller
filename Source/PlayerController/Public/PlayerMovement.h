@@ -22,25 +22,47 @@ class PLAYERCONTROLLER_API UPlayerMovement : public UCharacterMovementComponent
 	UPlayerMovement();
 
 protected:
-	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
-		float WalkSpeed;
-
-	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
-		float GroundAcceleration;
-
-	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
-		float AirAcceleration;
-
-	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0", UIMin = "0"))
-		float AirSpeedCap;
 
 private:
-	void PreemptCollision(float delta);
+	
 
-	bool bLastGrounded = false;
+	// unit vector of direction player wants to move
+	FVector m_wishdir;
+
+	FVector m_maxwalkspeedvec;
+	FVector m_maxairspeedvec;
 
 public:
-	FVector WishDir;
+	int m_fwdvalue = 0;
+	int m_rgtvalue = 0;
+
+	inline void AddInput(FVector dirvec)
+	{
+		m_wishdir += dirvec;
+		dirvec = dirvec.GetSafeNormal(0.01f); // never have to piss around
+	}
+
+	inline FVector GetWishDir()
+	{
+		const auto& player = GetPawnOwner();
+
+		FVector inputvec = FVector(m_fwdvalue, m_rgtvalue, 0);
+		FVector wishdir  = player->GetActorRotation().RotateVector(inputvec);
+		
+		return  wishdir.GetSafeNormal(0.01f);
+	}
+
+	// for debug use TODO : dont compile on final build
+	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float m_maxwalkspeed;
+
+	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float m_maxairspeed;
+
+	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float m_accelerationspeed;
+
+	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void CalcVelocity(float delta, float friction, bool bFluid, float brakingDeceleration) override;
 	void ApplyVelocityBraking(float delta, float friction, float brakingDeceleration) override;

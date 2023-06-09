@@ -56,8 +56,9 @@ void APlayerCharacter::Move(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		MovementPtr->WishDir = GetActorForwardVector() * Value;
-		// AddMovementInput(GetActorForwardVector(), Value);
+		int bit = (int)fabsf(Value);
+		int newValue = (MovementPtr->m_fwdvalue ^ bit) * Value;
+		MovementPtr->m_fwdvalue = newValue;
 	}
 }
 
@@ -65,8 +66,9 @@ void APlayerCharacter::Strafe(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		MovementPtr->WishDir = GetActorRightVector() * Value;
-		// AddMovementInput(GetActorRightVector(), Value);
+		int bit = (int)fabsf(Value);
+		int newValue = (MovementPtr->m_rgtvalue ^ bit) * Value;
+		MovementPtr->m_rgtvalue = newValue;
 	}
 }
 
@@ -82,6 +84,13 @@ void APlayerCharacter::Tick(float DeltaTime)
 	OnScreenDebugger::DrawDebugMessage("pos:  " + PositionStr, FColor::White, 2);
 	OnScreenDebugger::DrawDebugMessage("vel:  " + VelocityStr, FColor::White, 3);
 	OnScreenDebugger::DrawDebugMessage("accel:" + VelocityStr, FColor::White, 4);
+
+	/*
+	const auto& ForwardVecStr = GetActorForwardVector().ToCompactString();
+	const auto& RightVecStr = GetActorRightVector().ToCompactString();
+	OnScreenDebugger::DrawDebugMessage("fwd:  " + ForwardVecStr, FColor::White, 6);
+	OnScreenDebugger::DrawDebugMessage("rgt:  " + RightVecStr, FColor::White, 7);
+	*/
 
 	const auto& IsOnGround = MovementPtr->IsMovingOnGround();
 	OnScreenDebugger::DrawDebugMessage("onground", IsOnGround, 5);
