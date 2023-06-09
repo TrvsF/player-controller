@@ -24,12 +24,12 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& objectInitializer)
 	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 
 	// movement
-	MovementPtr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
+	m_movementptr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 }
 
 void APlayerCharacter::Jump()
 {
-	MovementPtr->DoJump(false);
+	m_movementptr->DoJump(false);
 }
 
 void APlayerCharacter::AddControllerYawInput(float Value)
@@ -56,9 +56,7 @@ void APlayerCharacter::Move(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		int bit = (int)fabsf(Value);
-		int newValue = (MovementPtr->m_fwdvalue ^ bit) * Value;
-		MovementPtr->m_fwdvalue = newValue;
+		m_movementptr->AddFowardInput(Value);
 	}
 }
 
@@ -66,9 +64,7 @@ void APlayerCharacter::Strafe(float Value)
 {
 	if (Controller && !FMath::IsNearlyZero(Value))
 	{
-		int bit = (int)fabsf(Value);
-		int newValue = (MovementPtr->m_rgtvalue ^ bit) * Value;
-		MovementPtr->m_rgtvalue = newValue;
+		m_movementptr->AddStrafeInput(Value);
 	}
 }
 
@@ -79,20 +75,12 @@ void APlayerCharacter::Tick(float DeltaTime)
 	
 	const auto& PositionStr = GetActorLocation().ToCompactString();
 	const auto& VelocityStr = FString::SanitizeFloat(GetMovementComponent()->Velocity.Size());
-	const auto& AccelStr    = FString::SanitizeFloat(MovementPtr->GetCurrentAcceleration().Size());
+	const auto& AccelStr    = FString::SanitizeFloat(m_movementptr->GetCurrentAcceleration().Size());
+	OnScreenDebugger::DrawDebugMessage("pos: " + PositionStr, FColor::White, 2);
+	OnScreenDebugger::DrawDebugMessage("vel: " + VelocityStr, FColor::White, 3);
+	OnScreenDebugger::DrawDebugMessage("accel: " + VelocityStr, FColor::White, 4);
 
-	OnScreenDebugger::DrawDebugMessage("pos:  " + PositionStr, FColor::White, 2);
-	OnScreenDebugger::DrawDebugMessage("vel:  " + VelocityStr, FColor::White, 3);
-	OnScreenDebugger::DrawDebugMessage("accel:" + VelocityStr, FColor::White, 4);
-
-	/*
-	const auto& ForwardVecStr = GetActorForwardVector().ToCompactString();
-	const auto& RightVecStr = GetActorRightVector().ToCompactString();
-	OnScreenDebugger::DrawDebugMessage("fwd:  " + ForwardVecStr, FColor::White, 6);
-	OnScreenDebugger::DrawDebugMessage("rgt:  " + RightVecStr, FColor::White, 7);
-	*/
-
-	const auto& IsOnGround = MovementPtr->IsMovingOnGround();
+	const auto& IsOnGround = m_movementptr->IsMovingOnGround();
 	OnScreenDebugger::DrawDebugMessage("onground", IsOnGround, 5);
 }
 
@@ -116,7 +104,7 @@ void APlayerCharacter::OnMovementModeChanged(EMovementMode prevMode, uint8 prevC
 		ResetJumpState();
 	}
 
-	if (MovementPtr->IsFalling() && bProxyIsJumpForceApplied) {
+	if (m_movementptr->IsFalling() && bProxyIsJumpForceApplied) {
 		ProxyJumpForceStartedTime = GetWorld()->GetTimeSeconds();
 	}
 	else {
@@ -126,6 +114,6 @@ void APlayerCharacter::OnMovementModeChanged(EMovementMode prevMode, uint8 prevC
 		bWasJumping = false;
 	}
 
-	K2_OnMovementModeChanged(prevMode, MovementPtr->MovementMode, prevCustomMode, MovementPtr->CustomMovementMode);
+	K2_OnMovementModeChanged(prevMode, m_movementptr->MovementMode, prevCustomMode, m_movementptr->CustomMovementMode);
 	MovementModeChangedDelegate.Broadcast(this, prevMode, prevCustomMode);
 }

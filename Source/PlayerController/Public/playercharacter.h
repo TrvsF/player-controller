@@ -44,7 +44,7 @@ private:
 	UPROPERTY(Category = "Player Collision", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UBoxComponent* CollisionBox;
 
-	UPlayerMovement* MovementPtr;
+	UPlayerMovement* m_movementptr;
 
 protected:
 	virtual void BeginPlay() override;
