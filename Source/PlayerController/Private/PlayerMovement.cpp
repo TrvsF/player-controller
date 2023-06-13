@@ -2,88 +2,162 @@
 
 UPlayerMovement::UPlayerMovement()
 {
-    m_maxwalkspeed = 800.f;
-    m_maxairspeed = 1500.f;
-    m_acelerationspeed = 50000.f;
-
-    m_maxwalkspeedvec = FVector{ m_maxwalkspeed, m_maxwalkspeed, 0 };
-    m_maxairspeedvec  = FVector{ m_maxwalkspeed, m_maxwalkspeed, 0 };
+    m_maxwalkspeed = 600.f;
+    m_maxairspeed  = 2000.f;
+    m_acelerationspeed = 3000.f;
+	m_friction = 12.f;
 }
 
 void UPlayerMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	m_tickcheck = false;
 
-    if (TickType == LEVELTICK_All)
-    {
-        CalcVelocity(DeltaTime, GetMaxBrakingDeceleration(), false, false);
-    }
+	// TODO : figure out exactly why this is needed -
+	//		  its overriding *something* but im not sure what
+	if (TickType == LEVELTICK_All)
+	{
+		// TickVelocity(DeltaTime);
+	}
+
+	FString velstr = FString::SanitizeFloat(Velocity.Size2D());
+	OnScreenDebugger::DrawDebugMessage("vel: " + velstr, FColor::White, 10);
+	OnScreenDebugger::DrawDebugMessage("onground", IsMovingOnGround(), 11);
+}
+
+void UPlayerMovement::TickVelocity(float delta)
+{
+	// TODO : shit hack
+	if (m_tickcheck) 
+	{
+		OnScreenDebugger::DrawDebugMessage("tc", FColor::Red, -1);
+		return; 
+	}
+	m_tickcheck = true;
+
+	if (IsMovingOnGround())
+	{
+		UpdateVelocityGround(delta);
+	}
+	else
+	{
+		UpdateVelocityAir(delta);
+	}
+}
+
+void UPlayerMovement::UpdateVelocity(FVector moveadd)
+{
+	float wishvel = (Velocity + moveadd).Size2D();
+
+	if (wishvel <= m_maxwalkspeed)
+	{ Velocity += moveadd; }
+}
+
+void UPlayerMovement::UpdateVelocityGround(float delta)
+{
+	// wish
+	FVector wishdir = GetWishDir().GetSafeNormal2D();
+	float wishspeed = m_maxwalkspeed;
+
+	// fpply friction
+	float speed = Velocity.Size2D();
+	if (speed != 0)
+	{
+		float drop = speed * m_friction * delta;
+		Velocity *= FMath::Max(speed - drop, 0) / speed;
+	}
+
+	float currentspeed = FVector::DotProduct(Velocity, wishdir);
+	float addspeed = FMath::Clamp(wishspeed - currentspeed, 0, m_acelerationspeed * delta);
+
+	// debug
+	FString wishdirstr = wishdir.ToCompactString();
+	OnScreenDebugger::DrawDebugMessage("wishdir: " + wishdirstr, FColor::Green, 20);
+
+	FString wishvelstr = FString::SanitizeFloat(wishspeed);
+	OnScreenDebugger::DrawDebugMessage("wishspd: " + wishvelstr, FColor::Green, 21);
+
+	FString currentstr = FString::SanitizeFloat(currentspeed);
+	OnScreenDebugger::DrawDebugMessage("currentspeed: " + currentstr, FColor::Green, 22);
+
+	FString addstr = FString::SanitizeFloat(addspeed);
+	OnScreenDebugger::DrawDebugMessage("add: " + addstr, FColor::Green, 23);
+
+	FString onestr = FString::SanitizeFloat(wishspeed - currentspeed);
+	OnScreenDebugger::DrawDebugMessage("1: " + onestr, FColor::Green, 24);
+
+	FString twostr = FString::SanitizeFloat(m_acelerationspeed * delta);
+	OnScreenDebugger::DrawDebugMessage("2: " + twostr, FColor::Green, 25);
+
+	// update speed
+	UpdateVelocity(wishdir * addspeed);
+
+	// reset vars TODO : MOVEME
+	m_fwdvalue = 0;
+	m_rgtvalue = 0;
+}
+
+void UPlayerMovement::UpdateVelocityAir(float delta)
+{
+	FVector wishvel = GetWishDir();
+	FVector wishdir = wishvel.GetSafeNormal2D();
+
+	// get updated speed
+	float currentspeed = FVector::DotProduct(Velocity, wishdir);
+	float addspeed = FMath::Clamp(m_maxairspeed - currentspeed, 0, m_acelerationspeed * delta);
+
+	FString wishdirstr = wishdir.ToCompactString();
+	OnScreenDebugger::DrawDebugMessage("wishdir: " + wishdirstr, FColor::Red, 20);
+
+	FString wishvelstr = wishvel.ToCompactString();
+	OnScreenDebugger::DrawDebugMessage("wishvel: " + wishvelstr, FColor::Red, 21);
+
+	FString currentstr = FString::SanitizeFloat(currentspeed);
+	OnScreenDebugger::DrawDebugMessage("current: " + currentstr, FColor::Red, 22);
+
+	FString addstr = FString::SanitizeFloat(addspeed);
+	OnScreenDebugger::DrawDebugMessage("add: " + addstr, FColor::Red, 23);
+
+	// update speed
+	UpdateVelocity(wishdir * addspeed);
+
+	// reset vars TODO : MOVEME
+	m_fwdvalue = 0;
+	m_rgtvalue = 0;
 }
 
 FVector UPlayerMovement::GetWishDir()
 {
-    const auto& player = GetPawnOwner();
+	// TODO : can be replaced with direct vector methods 
+	FVector foward = GetOwner()->GetActorForwardVector();
+	FVector right  = GetOwner()->GetActorRightVector();
 
-    FVector inputvec = FVector(m_fwdvalue, m_rgtvalue, 0);
-    FVector wishdir = player->GetActorRotation().RotateVector(inputvec);
+	FVector wishdir;
+	for (int i = 0; i < 3; i++)
+	{ wishdir[i] = foward[i] * m_fwdvalue + right[i] * m_rgtvalue; }
 
-    return wishdir.GetSafeNormal(0.01f);
+	if (wishdir == FVector::Zero())
+	{
+		OnScreenDebugger::DrawDebugMessage("0", FColor::Blue, -1);
+	}
+
+	return wishdir;
 }
 
 void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, float brakingDeceleration)
 {
-    // validate
-    if (!HasValidData() || HasAnimRootMotion() || delta < MIN_TICK_TIME || (CharacterOwner && CharacterOwner->GetLocalRole() == ROLE_SimulatedProxy))
-	{
-        return;
-    }
-
-    // setup vars
-    const auto& wishdir = GetWishDir();
-    bool ismovingonground = IsMovingOnGround();
-    bool isfalling = IsFalling();
-
-    // firction
-    friction = FMath::Max(0.f, friction);
-    if (ismovingonground && wishdir == FVector::Zero())
-    {
-        const float actualBrakingFriction = bUseSeparateBrakingFriction ? BrakingFriction : friction;
-        ApplyVelocityBraking(delta, actualBrakingFriction, brakingDeceleration);
-    }
-
-    // get specific max speed
-    float maxspeed = ismovingonground ? m_maxwalkspeed : m_maxairspeed;
-
-    // get updated speed
-    const auto& current_speed = FVector::DotProduct(Velocity, wishdir);
-    const auto& add_speed = FMath::Clamp(maxspeed - current_speed, 0, m_acelerationspeed * delta);
-
-    // update speed
-    Velocity += wishdir * add_speed;
-
-    // debug 
-    const auto& WishDirStr = wishdir.ToString();
-    OnScreenDebugger::DrawDebugMessage("wish:  " + WishDirStr, FColor::White, 6);
-    const auto& CurrentSpeedStr = FString::SanitizeFloat(current_speed);
-    OnScreenDebugger::DrawDebugMessage("current speed:  " + CurrentSpeedStr, FColor::White, 7);
-    const auto& AddSpeedStr = FString::SanitizeFloat(add_speed);
-    OnScreenDebugger::DrawDebugMessage("add speed:  " + AddSpeedStr, FColor::White, 8);
-
-    // reset vars TODO : MOVEME
-    m_fwdvalue = 0;
-    m_rgtvalue = 0;
+	TickVelocity(delta);
 }
 
 void UPlayerMovement::ApplyVelocityBraking(float delta, float friction, float brakingDeceleration)
 {
     float speed = Velocity.Size2D();
 
-    if (speed <= 0.1f || !HasValidData() || HasAnimRootMotion() || delta < MIN_TICK_TIME)
+    if (speed <= 0.15f || !HasValidData() || HasAnimRootMotion() || delta < MIN_TICK_TIME)
 	{
         return;
     }
 
-    friction *= BrakingFrictionFactor;
     brakingDeceleration = FMath::Max(brakingDeceleration, speed);
 
     if (FMath::IsNearlyZero(friction) || FMath::IsNearlyZero(brakingDeceleration))
@@ -91,8 +165,8 @@ void UPlayerMovement::ApplyVelocityBraking(float delta, float friction, float br
         return;
     }
 
-    const FVector oldVel = Velocity;
-    const FVector revAccel = friction * brakingDeceleration * oldVel.GetSafeNormal();
+    FVector oldVel = Velocity;
+    FVector revAccel = friction * brakingDeceleration * oldVel.GetSafeNormal();
 
     Velocity -= revAccel * delta;
 
@@ -137,5 +211,5 @@ float UPlayerMovement::SlideAlongSurface(const FVector& delta, float time, const
 
 float UPlayerMovement::GetMaxSpeed() const
 {
-    return m_maxwalkspeed;
+    return IsMovingOnGround() ? m_maxwalkspeed : m_maxairspeed;
 }

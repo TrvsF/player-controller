@@ -28,6 +28,18 @@ class PLAYERCONTROLLER_API APlayerCharacter : public ACharacter
 public:
 	APlayerCharacter(const FObjectInitializer& objectInitializer);
 
+	inline FVector GetMovementVector() const
+	{ return m_movementvector; }
+
+	// TODO : probably not a good idea??
+	inline FVector GetWishDir() const
+	{
+		const auto& f = GetActorForwardVector() * m_movementvector.X;
+		const auto& r = GetActorRightVector() * m_movementvector.Y;
+
+		return f + r;
+	}
+
 private:
 	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* FirstPersonCameraComp;
@@ -45,6 +57,7 @@ private:
 		UBoxComponent* CollisionBox;
 
 	UPlayerMovement* m_movementptr;
+	FVector m_movementvector;
 
 protected:
 	virtual void BeginPlay() override;

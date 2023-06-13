@@ -44,7 +44,7 @@ void APlayerCharacter::AddControllerPitchInput(float Value)
 	Super::AddControllerPitchInput(Value);
 }
 
-// Called when the game starts or when spawned
+// called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -68,23 +68,20 @@ void APlayerCharacter::Strafe(float Value)
 	}
 }
 
-// Called every frame
+// called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	const auto& PositionStr = GetActorLocation().ToCompactString();
-	const auto& VelocityStr = FString::SanitizeFloat(GetMovementComponent()->Velocity.Size());
-	const auto& AccelStr    = FString::SanitizeFloat(m_movementptr->GetCurrentAcceleration().Size());
-	OnScreenDebugger::DrawDebugMessage("pos: " + PositionStr, FColor::White, 2);
-	OnScreenDebugger::DrawDebugMessage("vel: " + VelocityStr, FColor::White, 3);
-	OnScreenDebugger::DrawDebugMessage("accel: " + VelocityStr, FColor::White, 4);
+	if (m_movementptr)
+	{
+		m_movementptr->TickComponent(DeltaTime, LEVELTICK_All, NULL);
+	}
 
-	const auto& IsOnGround = m_movementptr->IsMovingOnGround();
-	OnScreenDebugger::DrawDebugMessage("onground", IsOnGround, 5);
+	const auto& PositionStr = GetActorLocation().ToCompactString();
+	OnScreenDebugger::DrawDebugMessage("pos: " + PositionStr, FColor::White, 0);
 }
 
-// Called to bind functionality to input
+// called to bind functionality to input
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -98,16 +95,20 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("Pitch", this, &APlayerCharacter::AddControllerPitchInput);
 }
 
+// TODO : remove me?
 void APlayerCharacter::OnMovementModeChanged(EMovementMode prevMode, uint8 prevCustomMode)
 {
-	if (!bPressedJump) {
+	if (!bPressedJump)
+	{
 		ResetJumpState();
 	}
 
-	if (m_movementptr->IsFalling() && bProxyIsJumpForceApplied) {
+	if (m_movementptr->IsFalling() && bProxyIsJumpForceApplied) 
+	{
 		ProxyJumpForceStartedTime = GetWorld()->GetTimeSeconds();
 	}
-	else {
+	else 
+	{
 		JumpCurrentCount = 0;
 		JumpKeyHoldTime = 0.f;
 		JumpForceTimeRemaining = 0.f;

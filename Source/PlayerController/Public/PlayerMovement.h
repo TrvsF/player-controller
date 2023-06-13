@@ -4,6 +4,7 @@
 
 #include "OnScreenDebugger.h"
 
+#include "GameFramework/PhysicsVolume.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -24,16 +25,16 @@ class PLAYERCONTROLLER_API UPlayerMovement : public UCharacterMovementComponent
 protected:
 
 private:
-	void DoMovement(float delta);
+	// veloicty methods
+	void TickVelocity(float delta);
+	void UpdateVelocity(FVector moveadd);
+	void UpdateVelocityGround(float delta);
+	void UpdateVelocityAir(float delta);
 
 	// unit vector of direction player wants to move
 	FVector GetWishDir();
 
-	FVector m_localvelocity;
-
-	FVector m_maxwalkspeedvec;
-	FVector m_maxairspeedvec;
-
+	bool m_tickcheck;
 	int m_fwdvalue = 0;
 	int m_rgtvalue = 0;
 
@@ -65,13 +66,17 @@ public:
 
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float m_acelerationspeed;
+	
+	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float m_friction;
 
 	// override methods
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	void CalcVelocity(float delta, float friction, bool bFluid, float brakingDeceleration) override;
 	void ApplyVelocityBraking	(float delta, float friction, float brakingDeceleration) override;
 	void TwoWallAdjust			(FVector& delta, const FHitResult& hit, const FVector& oldHitNormal) const override;
-	
+
 	FVector HandleSlopeBoosting	(const FVector& slideResult, const FVector& delta, const float time, const FVector& normal, const FHitResult& hit) const override;
 	bool	ShouldCatchAir		(const FFindFloorResult& oldFloor, const FFindFloorResult& newFloor) override;
 	bool	DoJump				(bool bClientSimulation) override;
