@@ -54,17 +54,17 @@ void APlayerCharacter::BeginPlay()
 
 void APlayerCharacter::Move(float Value)
 {
-	if (Controller && !FMath::IsNearlyZero(Value))
+	if (Controller)
 	{
-		m_movementptr->AddFowardInput(Value);
+		m_movementvector.X = Value;
 	}
 }
 
 void APlayerCharacter::Strafe(float Value)
 {
-	if (Controller && !FMath::IsNearlyZero(Value))
+	if (Controller)
 	{
-		m_movementptr->AddStrafeInput(Value);
+		m_movementvector.Y = Value;
 	}
 }
 
@@ -74,11 +74,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (m_movementptr)
 	{
+		m_movementptr->UpdateWishDir(GetWishDir());
 		m_movementptr->TickComponent(DeltaTime, LEVELTICK_All, NULL);
 	}
 
 	const auto& PositionStr = GetActorLocation().ToCompactString();
 	OnScreenDebugger::DrawDebugMessage("pos: " + PositionStr, FColor::White, 0);
+
+	const auto& WishStr = GetWishDir().ToCompactString();
+	OnScreenDebugger::DrawDebugMessage("wishdir: " + WishStr, FColor::White, 1);
 }
 
 // called to bind functionality to input

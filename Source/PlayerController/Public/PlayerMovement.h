@@ -32,29 +32,17 @@ private:
 	void UpdateVelocityAir(float delta);
 
 	// unit vector of direction player wants to move
-	FVector GetWishDir();
-
+	FVector m_wishdir;
 	bool m_tickcheck;
-	int m_fwdvalue = 0;
-	int m_rgtvalue = 0;
 
 public:
-	inline void AddFowardInput(float Value)
+	inline void UpdateWishDir(FVector wishdir)
 	{
-		// xor for 0 or 1, then make neg/pos
-		int bit = (int)fabsf(Value);
-		int newValue = (m_fwdvalue ^ bit) * Value;
-		
-		m_fwdvalue = newValue;
-	}
-
-	inline void AddStrafeInput(float Value)
-	{
-		// xor for 0 or 1, then make neg/pos
-		int bit = (int)fabsf(Value);
-		int newValue = (m_rgtvalue ^ bit) * Value;
-
-		m_rgtvalue = newValue;
+		m_wishdir = wishdir; 
+		if (wishdir == FVector::Zero())
+		{
+			OnScreenDebugger::DrawDebugMessage("zero", FColor::Red, 92);
+		} 
 	}
 
 	// for debug use TODO : move or make priavte on final build
@@ -78,7 +66,6 @@ public:
 	void TwoWallAdjust			(FVector& delta, const FHitResult& hit, const FVector& oldHitNormal) const override;
 
 	FVector HandleSlopeBoosting	(const FVector& slideResult, const FVector& delta, const float time, const FVector& normal, const FHitResult& hit) const override;
-	bool	ShouldCatchAir		(const FFindFloorResult& oldFloor, const FFindFloorResult& newFloor) override;
 	bool	DoJump				(bool bClientSimulation) override;
 	float	SlideAlongSurface	(const FVector& delta, float time, const FVector& normal, FHitResult& hit, bool bHandleImpact = false) override;
 	float	GetMaxSpeed() const override;

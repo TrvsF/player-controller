@@ -31,7 +31,6 @@ public:
 	inline FVector GetMovementVector() const
 	{ return m_movementvector; }
 
-	// TODO : probably not a good idea??
 	inline FVector GetWishDir() const
 	{
 		const auto& f = GetActorForwardVector() * m_movementvector.X;
