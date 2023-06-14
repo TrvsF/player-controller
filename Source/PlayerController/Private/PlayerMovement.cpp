@@ -17,8 +17,8 @@ void UPlayerMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	m_tickcheck = false;
 
 	FString velstr = FString::SanitizeFloat(Velocity.Size2D());
-	OnScreenDebugger::DrawDebugMessage("vel: " + velstr, FColor::White, 10);
-	OnScreenDebugger::DrawDebugMessage("onground", IsMovingOnGround(), 11);
+	OnScreenDebugger::DrawDebugMessage("vel: " + velstr, FColor::White, 100);
+	OnScreenDebugger::DrawDebugMessage("onground", IsMovingOnGround(), 101);
 }
 
 void UPlayerMovement::TickVelocity(float delta)
@@ -26,7 +26,7 @@ void UPlayerMovement::TickVelocity(float delta)
 	// TODO : shit hack
 	if (m_tickcheck) 
 	{
-		OnScreenDebugger::DrawDebugMessage("tc", FColor::Red, 91);
+		OnScreenDebugger::DrawDebugMessage("tc", FColor::Red, 102);
 		return; 
 	}
 	m_tickcheck = true;
@@ -44,7 +44,7 @@ void UPlayerMovement::TickVelocity(float delta)
 void UPlayerMovement::UpdateVelocity(FVector moveadd)
 {
 	const auto& addstr = FString::SanitizeFloat(moveadd.Size2D());
-	OnScreenDebugger::DrawDebugMessage("addspeed: " + addstr, FColor::Green, 80);
+	OnScreenDebugger::DrawDebugMessage("addspeed: " + addstr, FColor::Green, 103);
 
 	bool onground = IsMovingOnGround();
 	float wishvel = (Velocity + moveadd).Size2D();
@@ -56,7 +56,7 @@ void UPlayerMovement::UpdateVelocity(FVector moveadd)
 	// debug
 	else 
 	{ 
-		OnScreenDebugger::DrawDebugMessage("clamped", FColor::Green, 81);
+		OnScreenDebugger::DrawDebugMessage("clamped", FColor::Green, 104);
 	}
 }
 
