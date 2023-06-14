@@ -39,6 +39,14 @@ public:
 		return f + r;
 	}
 
+	inline FVector GetWishDirAir() const
+	{
+		const auto& f = GetActorForwardVector() * m_movementvector.X * 0.2f;
+		const auto& r = GetActorRightVector()   * m_movementvector.Y;
+
+		return f + r;
+	}
+
 private:
 	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* FirstPersonCameraComp;

@@ -2,10 +2,13 @@
 
 UPlayerMovement::UPlayerMovement()
 {
-    m_maxwalkspeed = 500.f;
+    m_maxgroundspeed = 700.f;
     m_maxairspeed  = 2000.f;
-    m_acelerationspeed = 2400.f;
-	m_friction = 1000.f;
+
+    m_acelerationgroundspeed = 3200.f;
+    m_acelerationairspeed = 100.f;
+
+	m_friction = 1500.f;
 }
 
 void UPlayerMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -43,20 +46,50 @@ void UPlayerMovement::UpdateVelocity(FVector moveadd)
 	const auto& addstr = FString::SanitizeFloat(moveadd.Size2D());
 	OnScreenDebugger::DrawDebugMessage("addspeed: " + addstr, FColor::Green, 80);
 
+	bool onground = IsMovingOnGround();
 	float wishvel = (Velocity + moveadd).Size2D();
 
-	if (wishvel <= m_maxwalkspeed)
-	{ Velocity += moveadd; }
-	else { OnScreenDebugger::DrawDebugMessage("clamped", FColor::Green, 81); }
+	if (wishvel <= (onground ? m_maxgroundspeed : m_maxairspeed))
+	{ 
+		Velocity += moveadd;
+	}
+	// debug
+	else 
+	{ 
+		OnScreenDebugger::DrawDebugMessage("clamped", FColor::Green, 81);
+	}
 }
 
 void UPlayerMovement::UpdateVelocityGround(float delta)
 {
 	// wish
 	FVector wishdir = m_wishdir.GetSafeNormal2D();
-	float wishspeed = m_maxwalkspeed;
+	float wishspeed = m_maxgroundspeed;
 
-	// fpply friction
+	DoFriction(delta);
+
+	float currentspeed = FVector::DotProduct(Velocity, wishdir);
+	float addspeed = FMath::Clamp(wishspeed - currentspeed, 0, m_acelerationgroundspeed * delta);
+
+	// update speed
+	UpdateVelocity(wishdir * addspeed);
+}
+
+void UPlayerMovement::UpdateVelocityAir(float delta)
+{
+	// wish
+	FVector wishdir = m_wishdir.GetSafeNormal2D();
+	float wishspeed = m_maxairspeed;
+
+	float currentspeed = FVector::DotProduct(Velocity, wishdir);
+	float addspeed = FMath::Clamp(wishspeed - currentspeed, 0, m_acelerationairspeed * delta);
+
+	// update speed
+	UpdateVelocity(wishdir * addspeed);
+}
+
+void UPlayerMovement::DoFriction(float delta)
+{
 	float speed = Velocity.Size2D();
 	if (speed != 0)
 	{
@@ -70,25 +103,6 @@ void UPlayerMovement::UpdateVelocityGround(float delta)
 
 		Velocity *= newspeed;
 	}
-
-	float currentspeed = FVector::DotProduct(Velocity, wishdir);
-	float addspeed = FMath::Clamp(wishspeed - currentspeed, 0, m_acelerationspeed * delta);
-
-	// update speed
-	UpdateVelocity(wishdir * addspeed);
-}
-
-void UPlayerMovement::UpdateVelocityAir(float delta)
-{
-	FVector wishvel = m_wishdir;
-	FVector wishdir = wishvel.GetSafeNormal2D();
-
-	// get updated speed
-	float currentspeed = FVector::DotProduct(Velocity, wishdir);
-	float addspeed = FMath::Clamp(m_maxairspeed - currentspeed, 0, m_acelerationspeed * delta);
-
-	// update speed
-	UpdateVelocity(wishdir * addspeed);
 }
 
 void UPlayerMovement::CalcVelocity(float delta, float friction, bool bFluid, float brakingDeceleration)
@@ -145,5 +159,5 @@ float UPlayerMovement::SlideAlongSurface(const FVector& delta, float time, const
 
 float UPlayerMovement::GetMaxSpeed() const
 {
-    return IsMovingOnGround() ? m_maxwalkspeed : m_maxairspeed;
+    return IsMovingOnGround() ? m_maxgroundspeed : m_maxairspeed;
 }

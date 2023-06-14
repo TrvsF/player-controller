@@ -27,9 +27,11 @@ protected:
 private:
 	// veloicty methods
 	void TickVelocity(float delta);
+
 	void UpdateVelocity(FVector moveadd);
 	void UpdateVelocityGround(float delta);
 	void UpdateVelocityAir(float delta);
+	void DoFriction(float delta);
 
 	// unit vector of direction player wants to move
 	FVector m_wishdir;
@@ -47,13 +49,16 @@ public:
 
 	// for debug use TODO : move or make priavte on final build
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float m_maxwalkspeed;
+		float m_maxgroundspeed;
 
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float m_maxairspeed;
 
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float m_acelerationspeed;
+		float m_acelerationgroundspeed;
+	
+	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float m_acelerationairspeed;
 	
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float m_friction;
