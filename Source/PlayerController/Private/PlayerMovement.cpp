@@ -6,10 +6,10 @@ UPlayerMovement::UPlayerMovement()
     m_maxgroundspeed = 600.f;
     m_maxairspeed  = 1500.f;
 	// accel
-    m_acelerationgroundspeed = 3200.f;
-    m_acelerationairspeed = 200.f;
+    m_acelerationgroundspeed = 3000.f;
+    m_acelerationairspeed = 25.f;
 	// friction
-	m_friction = 1200.f;
+	m_friction = 1500.f;
 	// jump
 	m_jumpspeed = 450.f;
 
@@ -51,16 +51,22 @@ void UPlayerMovement::UpdateVelocity(FVector moveadd)
 	const auto& addstr = FString::SanitizeFloat(moveadd.Size2D());
 	OnScreenDebugger::DrawDebugMessage("addspeed: " + addstr, FColor::Green, 103);
 
+	// onground differences
 	bool onground = IsMovingOnGround();
+	float maxspeed = onground ? m_maxgroundspeed : m_maxairspeed;
+	
+	// vel we want
 	float wishvel = (Velocity + moveadd).Size2D();
 
-	if (wishvel <= (onground ? m_maxgroundspeed : m_maxairspeed))
+	// vel we get
+	if (wishvel <= maxspeed)
 	{ 
 		Velocity += moveadd;
 	}
 	// debug
 	else 
 	{ 
+		Velocity += moveadd.GetClampedToMaxSize2D(maxspeed - Velocity.Size2D());
 		OnScreenDebugger::DrawDebugMessage("clamped", FColor::Green, 104);
 	}
 }

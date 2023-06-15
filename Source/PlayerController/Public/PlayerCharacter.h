@@ -33,12 +33,8 @@ public:
 
 	inline FVector GetWishDir() const
 	{
-		bool onground = m_movementptr->IsMovingOnGround();
-		float ffactor = onground ? 1.f : 0.1f;
-		float rfactor = onground ? 1.f : 0.2f;
-
-		const auto& f = GetActorForwardVector() * m_movementvector.X * ffactor;
-		const auto& r = GetActorRightVector()   * m_movementvector.Y * rfactor;
+		const auto& f = GetActorForwardVector() * m_movementvector.X;
+		const auto& r = GetActorRightVector()   * m_movementvector.Y;
 
 		return f + r;
 	}
