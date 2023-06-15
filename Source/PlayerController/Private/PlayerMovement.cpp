@@ -2,13 +2,18 @@
 
 UPlayerMovement::UPlayerMovement()
 {
-    m_maxgroundspeed = 700.f;
-    m_maxairspeed  = 2000.f;
-
+	// max speed
+    m_maxgroundspeed = 600.f;
+    m_maxairspeed  = 1500.f;
+	// accel
     m_acelerationgroundspeed = 3200.f;
-    m_acelerationairspeed = 100.f;
+    m_acelerationairspeed = 200.f;
+	// friction
+	m_friction = 1200.f;
+	// jump
+	m_jumpspeed = 450.f;
 
-	m_friction = 1500.f;
+	GravityScale = 0.6f;
 }
 
 void UPlayerMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -139,7 +144,17 @@ void UPlayerMovement::ApplyVelocityBraking(float delta, float friction, float br
 
 bool UPlayerMovement::DoJump(bool bClientSimulation)
 {
-    return Super::DoJump(bClientSimulation);
+	if (CharacterOwner && CharacterOwner->CanJump())
+	{
+		if (!bConstrainToPlane || FMath::Abs(PlaneConstraintNormal.Z) != 1.f)
+		{
+			Velocity.Z = FMath::Max<FVector::FReal>(Velocity.Z, m_jumpspeed);
+			SetMovementMode(MOVE_Falling);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void UPlayerMovement::TwoWallAdjust(FVector& delta, const FHitResult& hit, const FVector& oldHitNormal) const
