@@ -13,7 +13,7 @@
 #include "PlayerMovement.generated.h"
 
 /**
- * 
+ * does all movement calculations
  */
 UCLASS()
 class PLAYERCONTROLLER_API UPlayerMovement : public UCharacterMovementComponent
@@ -50,33 +50,28 @@ public:
 
 	// for debug use TODO : move or make priavte on final build
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float m_maxgroundspeed;
+		float MaxGroundSpeed;
 
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float m_maxairspeed;
+		float MaxAirSpeed;
 
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float m_acelerationgroundspeed;
+		float GroundAccelerationSpeed;
 	
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float m_acelerationairspeed;
+		float AirAccelerationSpeed;
 	
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float m_friction;
+		float BaseGroundFriction;
 	
 	UPROPERTY(Category = "Player Movement", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float m_jumpspeed;
+		float JumpSpeed;
 
 	// override methods
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	void CalcVelocity(float delta, float friction, bool bFluid, float brakingDeceleration) override;
-	void ApplyVelocityBraking	(float delta, float friction, float brakingDeceleration) override;
-	void TwoWallAdjust			(FVector& delta, const FHitResult& hit, const FVector& oldHitNormal) const override;
 
-	FVector HandleSlopeBoosting	(const FVector& slideResult, const FVector& delta, const float time, const FVector& normal, const FHitResult& hit) const override;
-	bool	DoJump				(bool bClientSimulation) override;
-	float	SlideAlongSurface	(const FVector& delta, float time, const FVector& normal, FHitResult& hit, bool bHandleImpact = false) override;
-	float	GetMaxSpeed() const override;
+	bool DoJump(bool bClientSimulation) override;
+	float GetMaxSpeed() const override;
 
 };

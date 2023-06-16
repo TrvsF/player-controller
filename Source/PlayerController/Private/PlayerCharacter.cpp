@@ -27,6 +27,14 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& objectInitializer)
 	m_movementptr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 }
 
+FVector APlayerCharacter::GetWishDir() const
+{
+	const auto& f = GetActorForwardVector() * m_movementvector.X;
+	const auto& r = GetActorRightVector()   * m_movementvector.Y;
+
+	return f + r;
+}
+
 void APlayerCharacter::Jump()
 {
 	m_movementptr->DoJump(false);
@@ -48,7 +56,6 @@ void APlayerCharacter::AddControllerPitchInput(float Value)
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
 	OnScreenDebugger::DrawDebugMessage("spawned player", FColor::Green, -1);
 }
 
@@ -72,15 +79,16 @@ void APlayerCharacter::Strafe(float Value)
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	// tick movement
 	if (m_movementptr)
 	{
 		m_movementptr->UpdateWishDir(GetWishDir());
 		m_movementptr->TickComponent(DeltaTime, LEVELTICK_All, NULL);
 	}
 
+	// debug
 	const auto& PositionStr = GetActorLocation().ToCompactString();
 	OnScreenDebugger::DrawDebugMessage("pos: " + PositionStr, FColor::White, 0);
-
 	const auto& WishStr = GetWishDir().ToCompactString();
 	OnScreenDebugger::DrawDebugMessage("wishdir: " + WishStr, FColor::White, 1);
 }
@@ -90,35 +98,10 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// TODO : replace with the new UE5 shit
 	PlayerInputComponent->BindAction("Jump", IE_Pressed,  this, &APlayerCharacter::Jump);
-	
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::Move);
 	PlayerInputComponent->BindAxis("StrafeRight", this, &APlayerCharacter::Strafe);
-
 	PlayerInputComponent->BindAxis("Yaw",   this, &APlayerCharacter::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Pitch", this, &APlayerCharacter::AddControllerPitchInput);
-}
-
-// TODO : remove me?
-void APlayerCharacter::OnMovementModeChanged(EMovementMode prevMode, uint8 prevCustomMode)
-{
-	if (!bPressedJump)
-	{
-		ResetJumpState();
-	}
-
-	if (m_movementptr->IsFalling() && bProxyIsJumpForceApplied) 
-	{
-		ProxyJumpForceStartedTime = GetWorld()->GetTimeSeconds();
-	}
-	else 
-	{
-		JumpCurrentCount = 0;
-		JumpKeyHoldTime = 0.f;
-		JumpForceTimeRemaining = 0.f;
-		bWasJumping = false;
-	}
-
-	K2_OnMovementModeChanged(prevMode, m_movementptr->MovementMode, prevCustomMode, m_movementptr->CustomMovementMode);
-	MovementModeChangedDelegate.Broadcast(this, prevMode, prevCustomMode);
 }

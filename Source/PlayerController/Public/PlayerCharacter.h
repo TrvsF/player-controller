@@ -28,16 +28,7 @@ class PLAYERCONTROLLER_API APlayerCharacter : public ACharacter
 public:
 	APlayerCharacter(const FObjectInitializer& objectInitializer);
 
-	inline FVector GetMovementVector() const
-	{ return m_movementvector; }
-
-	inline FVector GetWishDir() const
-	{
-		const auto& f = GetActorForwardVector() * m_movementvector.X;
-		const auto& r = GetActorRightVector()   * m_movementvector.Y;
-
-		return f + r;
-	}
+	FVector GetWishDir() const;
 
 private:
 	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -71,6 +62,4 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	void OnMovementModeChanged(EMovementMode prevMode, uint8 prevCustomMode) override;
 };
