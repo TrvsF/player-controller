@@ -40,6 +40,7 @@ private:
 public:
 	inline void UpdateWishDir(FVector wishdir)
 	{
+		OnScreenDebugger::DrawDebugMessage("u", FColor::Green, 65);
 		m_wishdir = wishdir; 
 		if (wishdir == FVector::Zero())
 		{

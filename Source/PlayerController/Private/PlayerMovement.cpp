@@ -3,11 +3,11 @@
 UPlayerMovement::UPlayerMovement()
 {
 	// max speed
-    m_maxgroundspeed = 600.f;
-    m_maxairspeed  = 1500.f;
+    m_maxgroundspeed = 550.f;
+    m_maxairspeed    = 2400.f;
 	// accel
     m_acelerationgroundspeed = 3000.f;
-    m_acelerationairspeed = 25.f;
+    m_acelerationairspeed	 = 1800.f;
 	// friction
 	m_friction = 1500.f;
 	// jump
@@ -90,10 +90,15 @@ void UPlayerMovement::UpdateVelocityAir(float delta)
 {
 	// wish
 	FVector wishdir = m_wishdir.GetSafeNormal2D();
-	float wishspeed = m_maxairspeed;
+	float wishspeed = 15.f;
 
 	float currentspeed = FVector::DotProduct(Velocity, wishdir);
 	float addspeed = FMath::Clamp(wishspeed - currentspeed, 0, m_acelerationairspeed * delta);
+
+	/*
+	const auto& dspeedstr = FString::SanitizeFloat(m_acelerationairspeed * delta);
+	OnScreenDebugger::DrawDebugMessage(dspeedstr, FColor::Green, 110);
+	*/
 
 	// update speed
 	UpdateVelocity(wishdir * addspeed);
