@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "Rocket.h"
 #include "PlayerMovement.h"
 #include "OnScreenDebugger.h"
 
@@ -30,15 +31,12 @@ public:
 
 	FVector GetWishDir() const;
 
+	UPROPERTY(Category = "Player Rocket", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TSubclassOf<class ARocket> Rocket;
+
 private:
 	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* FirstPersonCameraComp;
-
-	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
-		float YawSensMultiplyer;
-
-	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
-		float PitchSensMultiplyer;
 
 	UPROPERTY(Category = "Player Mesh", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* MeshComp;
@@ -46,12 +44,19 @@ private:
 	UPROPERTY(Category = "Player Collision", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UBoxComponent* CollisionBox;
 
+	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
+		float YawSensMultiplyer;
+
+	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
+		float PitchSensMultiplyer;
+
 	UPlayerMovement* m_movementptr;
 	FVector m_movementvector;
 
 protected:
 	virtual void BeginPlay() override;
 
+	void Shoot();
 	void Jump() override;
 	void Move  (float Value);
 	void Strafe(float Value);

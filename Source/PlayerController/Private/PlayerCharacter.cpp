@@ -35,6 +35,24 @@ FVector APlayerCharacter::GetWishDir() const
 	return f + r;
 }
 
+void APlayerCharacter::Shoot()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		float distancefromplayer = 150.f;
+		FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * distancefromplayer;
+		FRotator SpawnRotation = FirstPersonCameraComp->GetComponentRotation();
+
+		ARocket* SpawnedProjectile = World->SpawnActor<ARocket>(Rocket, SpawnLocation, SpawnRotation);
+
+		if (SpawnedProjectile)
+		{
+			OnScreenDebugger::DrawDebugMessage("fired", FColor::Green, -1);
+		}
+	}
+}
+
 void APlayerCharacter::Jump()
 {
 	m_movementptr->DoJump(false);
@@ -99,7 +117,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// TODO : replace with the new UE5 shit
-	PlayerInputComponent->BindAction("Jump", IE_Pressed,  this, &APlayerCharacter::Jump);
+	PlayerInputComponent->BindAction("Jump",  IE_Pressed,  this, &APlayerCharacter::Jump);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed,  this, &APlayerCharacter::Shoot);
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::Move);
 	PlayerInputComponent->BindAxis("StrafeRight", this, &APlayerCharacter::Strafe);
 	PlayerInputComponent->BindAxis("Yaw",   this, &APlayerCharacter::AddControllerYawInput);

@@ -17,6 +17,15 @@ void UPlayerMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	m_tickcheck = false;
+	/*
+		note: 
+		forcing the movement to match the character tick probably isnt a good idea
+		however this is the way i got working for smooth, relyable inputs. 
+
+		TODO :
+		more work needs to go into looking at how events work, as i think they drive 
+		the movement componant
+	*/
 
 	// debug
 	FString velstr = FString::SanitizeFloat(Velocity.Size2D());
@@ -55,18 +64,21 @@ void UPlayerMovement::UpdateVelocity(FVector moveadd)
 	bool onground = IsMovingOnGround();
 	float maxspeed = onground ? MaxGroundSpeed : MaxAirSpeed;
 	
-	// vel we want
-	float wishvel = (Velocity + moveadd).Size2D();
+	// speed we want
+	float wishspeed = (Velocity + moveadd).Size2D();
 
-	// vel we get
-	if (wishvel <= maxspeed)
+	// speed we get
+	if (wishspeed <= maxspeed)
 	{ 
 		Velocity += moveadd;
 	}
-	// more debug
 	else 
 	{ 
-		Velocity += moveadd.GetClampedToMaxSize2D(maxspeed - Velocity.Size2D());
+		// clamps the vel to the max speed
+		float maxadd = maxspeed - Velocity.Size2D();
+		Velocity += moveadd.GetClampedToMaxSize2D(maxadd);
+
+		// more debug
 		OnScreenDebugger::DrawDebugMessage("clamped", FColor::Green, 104);
 	}
 }
@@ -97,11 +109,6 @@ void UPlayerMovement::UpdateVelocityAir(float delta)
 	// work out speed to add
 	float currentspeed = FVector::DotProduct(Velocity, wishdir);
 	float addspeed = FMath::Clamp(wishspeed - currentspeed, 0, AirAccelerationSpeed * delta);
-
-	/*
-	const auto& dspeedstr = FString::SanitizeFloat(m_acelerationairspeed * delta);
-	OnScreenDebugger::DrawDebugMessage(dspeedstr, FColor::Green, 110);
-	*/
 
 	// update speed
 	UpdateVelocity(wishdir * addspeed);
