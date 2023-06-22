@@ -1,5 +1,12 @@
 #include "Rocket.h"
 
+void ARocket::Tick(float DeltaTime)
+{
+	OnScreenDebugger::DrawDebugMessage(GetActorLocation().ToCompactString(), FColor::Green, -1);
+
+	Super::Tick(DeltaTime);
+}
+
 ARocket::ARocket()
 {
 	// rocket mesh
@@ -11,12 +18,6 @@ ARocket::ARocket()
 	UStaticMesh* SphereMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Engine/BasicShapes/Sphere.Sphere")); 
 	MeshComp->SetStaticMesh(SphereMesh);
 
-	// collsiion <<box>>
-	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Rocket Collision"));
-	CollisionBox->SetupAttachment(RootComponent);
-	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	CollisionBox->SetWorldScale3D({ 1.3f, 0.3f, 0.3f });
-
 	// movement 
 	ProjectileMovementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Rocket Movement"));
 	ProjectileMovementComp->SetUpdatedComponent(RootComponent);
@@ -25,29 +26,31 @@ ARocket::ARocket()
 	ProjectileMovementComp->bRotationFollowsVelocity = true;
 	ProjectileMovementComp->bShouldBounce = false;
 	ProjectileMovementComp->ProjectileGravityScale = 0.0f;
+
+	// collision
+	/*
+	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Rocket Collision"));
+	CollisionBox->SetupAttachment(RootComponent);
+	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionBox->SetWorldScale3D({ 1.3f, 0.3f, 0.3f });
+	*/
 }
 
-void ARocket::Explode(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
+void ARocket::Explode(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	OnScreenDebugger::DrawDebugMessage("boom", FColor::Red, -1);
 
-	Destroy();
+	ConditionalBeginDestroy();
 }
 
 void ARocket::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// inits
-	ProjectileMovementComp->Activate();
-	CollisionBox->OnComponentHit.AddDynamic(this, &ARocket::Explode);
+	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	MeshComp->OnComponentHit.AddDynamic(this, &ARocket::Explode); // doesnt fire
 
 	// debug
-	OnScreenDebugger::DrawDebugMessage("spawned rocket", FColor::Green, -1);
+	OnScreenDebugger::DrawDebugMessage("spawned rocket from rocket", FColor::Green, -1);
 }
-
-void ARocket::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
