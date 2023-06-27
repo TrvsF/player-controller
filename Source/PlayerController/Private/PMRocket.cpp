@@ -51,8 +51,8 @@ void ARocket::EndPlay(const EEndPlayReason::Type EndPlayReason)
 					// if actor is not blocked by a wall
 					if (!GetWorld()->LineTraceSingleByObjectType(rockethitresult, hitrocketlocation, hitcharacterlocation, objparams))
 					{
-						// calc kockback
-						FVector knockback = { 0, 0, 10000.f };
+						FVector distancevector = hitcharacterlocation - hitrocketlocation;
+						FVector knockback = distancevector * -100.f;
 						hitcharacter->AddVelocity(knockback);
 					}
 				}

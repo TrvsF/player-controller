@@ -117,6 +117,6 @@ void APMPlayer::AddVelocity(FVector Velocity)
 {
 	if (MovementPointer)
 	{
-		MovementPointer->Velocity += {0, 0, 150.0f};
+		MovementPointer->Velocity += Velocity;
 	}
 }
