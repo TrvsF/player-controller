@@ -27,6 +27,6 @@ void OnScreenDebugger::DrawDebugMessage(FString message, FColor colour, int id)
 {
 	if (GEngine)
 	{
-		GEngine->AddOnScreenDebugMessage(id, .1f, colour, message);
+		GEngine->AddOnScreenDebugMessage(id, 0.5f, colour, message);
 	}
 }

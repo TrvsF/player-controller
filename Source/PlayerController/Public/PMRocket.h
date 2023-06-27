@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "OnScreenDebugger.h"
+#include "PMCharacter.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/Actor.h"
@@ -11,7 +12,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 
-#include "Rocket.generated.h"
+#include "PMRocket.generated.h"
 
 UCLASS()
 class PLAYERCONTROLLER_API ARocket : public AActor

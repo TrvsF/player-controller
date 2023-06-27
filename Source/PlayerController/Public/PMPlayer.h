@@ -4,9 +4,8 @@
 
 #include "CoreMinimal.h"
 
-#include "PMChacter.h"
-#include "Rocket.h"
-#include "PlayerMovement.h"
+#include "PMCharacter.h"
+#include "PMRocket.h"
 #include "OnScreenDebugger.h"
 
 #include "GameFramework/Character.h"
@@ -18,17 +17,15 @@
 
 #include "Camera/CameraComponent.h"
 
-#include "PlayerCharacter.generated.h"
-
-class UPlayerMovement;
+#include "PMPlayer.generated.h"
 
 UCLASS()
-class PLAYERCONTROLLER_API APlayerCharacter : public APMChacter
+class PLAYERCONTROLLER_API APMPlayer : public APMCharacter
 {
 	GENERATED_BODY()
 
 public:
-	APlayerCharacter(const FObjectInitializer& objectInitializer);
+	APMPlayer(const FObjectInitializer& objectInitializer);
 
 	FVector GetWishDir() const;
 
@@ -45,7 +42,6 @@ private:
 	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
 		float PitchSensMultiplyer;
 
-	UPlayerMovement* m_movementptr;
 	FVector m_movementvector;
 
 protected:

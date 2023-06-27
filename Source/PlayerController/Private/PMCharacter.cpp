@@ -1,6 +1,6 @@
-#include "PMChacter.h"
+#include "PMCharacter.h"
 
-APMChacter::APMChacter(const FObjectInitializer& objectInitializer)
+APMCharacter::APMCharacter(const FObjectInitializer& objectInitializer)
 {
  	PrimaryActorTick.bCanEverTick = true;
 
@@ -12,14 +12,17 @@ APMChacter::APMChacter(const FObjectInitializer& objectInitializer)
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("Collision Box"));
 	CollisionBox->SetupAttachment(RootComponent);
 	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+	// movement
+	MovementPointer = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 }
 
-void APMChacter::BeginPlay()
+void APMCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void APMChacter::Tick(float DeltaTime)
+void APMCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }

@@ -1,6 +1,6 @@
-#include "PlayerCharacter.h"
+#include "PMPlayer.h"
 
-APlayerCharacter::APlayerCharacter(const FObjectInitializer& objectInitializer)
+APMPlayer::APMPlayer(const FObjectInitializer& objectInitializer)
 	: Super(objectInitializer.SetDefaultSubobjectClass<UPlayerMovement>(ACharacter::CharacterMovementComponentName))
 {
  	// tick every frame
@@ -13,12 +13,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& objectInitializer)
 	FirstPersonCameraComp->bUsePawnControlRotation = true;
 	YawSensMultiplyer	= 0.4f;
 	PitchSensMultiplyer = 0.3f;
-
-	// movement
-	m_movementptr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 }
 
-FVector APlayerCharacter::GetWishDir() const
+FVector APMPlayer::GetWishDir() const
 {
 	const auto& f = GetActorForwardVector() * m_movementvector.X;
 	const auto& r = GetActorRightVector()   * m_movementvector.Y;
@@ -26,7 +23,7 @@ FVector APlayerCharacter::GetWishDir() const
 	return f + r;
 }
 
-void APlayerCharacter::Shoot()
+void APMPlayer::Shoot()
 {
 	UWorld* World = GetWorld();
 	if (World)
@@ -44,31 +41,31 @@ void APlayerCharacter::Shoot()
 	}
 }
 
-void APlayerCharacter::Jump()
+void APMPlayer::Jump()
 {
-	m_movementptr->DoJump(false);
+	MovementPointer->DoJump(false);
 }
 
-void APlayerCharacter::AddControllerYawInput(float Value)
+void APMPlayer::AddControllerYawInput(float Value)
 {
 	Value *= YawSensMultiplyer;
 	Super::AddControllerYawInput(Value);
 }
 
-void APlayerCharacter::AddControllerPitchInput(float Value)
+void APMPlayer::AddControllerPitchInput(float Value)
 {
 	Value *= PitchSensMultiplyer;
 	Super::AddControllerPitchInput(Value);
 }
 
 // called when the game starts or when spawned
-void APlayerCharacter::BeginPlay()
+void APMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	OnScreenDebugger::DrawDebugMessage("spawned player", FColor::Green, -1);
 }
 
-void APlayerCharacter::Move(float Value)
+void APMPlayer::Move(float Value)
 {
 	if (Controller)
 	{
@@ -76,7 +73,7 @@ void APlayerCharacter::Move(float Value)
 	}
 }
 
-void APlayerCharacter::Strafe(float Value)
+void APMPlayer::Strafe(float Value)
 {
 	if (Controller)
 	{
@@ -85,14 +82,14 @@ void APlayerCharacter::Strafe(float Value)
 }
 
 // called every frame
-void APlayerCharacter::Tick(float DeltaTime)
+void APMPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	// tick movement
-	if (m_movementptr)
+	if (MovementPointer)
 	{
-		m_movementptr->UpdateWishDir(GetWishDir());
-		m_movementptr->TickComponent(DeltaTime, LEVELTICK_All, NULL);
+		MovementPointer->UpdateWishDir(GetWishDir());
+		MovementPointer->TickComponent(DeltaTime, LEVELTICK_All, NULL);
 	}
 
 	// debug
@@ -103,15 +100,15 @@ void APlayerCharacter::Tick(float DeltaTime)
 }
 
 // called to bind functionality to input
-void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void APMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// TODO : replace with the new UE5 shit
-	PlayerInputComponent->BindAction("Jump",  IE_Pressed,  this, &APlayerCharacter::Jump);
-	PlayerInputComponent->BindAction("Shoot", IE_Pressed,  this, &APlayerCharacter::Shoot);
-	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::Move);
-	PlayerInputComponent->BindAxis("StrafeRight", this, &APlayerCharacter::Strafe);
-	PlayerInputComponent->BindAxis("Yaw",   this, &APlayerCharacter::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("Pitch", this, &APlayerCharacter::AddControllerPitchInput);
+	PlayerInputComponent->BindAction("Jump",  IE_Pressed,  this, &APMPlayer::Jump);
+	PlayerInputComponent->BindAction("Shoot", IE_Pressed,  this, &APMPlayer::Shoot);
+	PlayerInputComponent->BindAxis("MoveForward", this, &APMPlayer::Move);
+	PlayerInputComponent->BindAxis("StrafeRight", this, &APMPlayer::Strafe);
+	PlayerInputComponent->BindAxis("Yaw",   this, &APMPlayer::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("Pitch", this, &APMPlayer::AddControllerPitchInput);
 }
