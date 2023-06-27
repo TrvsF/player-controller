@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "PMChacter.h"
 #include "Rocket.h"
 #include "PlayerMovement.h"
 #include "OnScreenDebugger.h"
@@ -22,7 +23,7 @@
 class UPlayerMovement;
 
 UCLASS()
-class PLAYERCONTROLLER_API APlayerCharacter : public ACharacter
+class PLAYERCONTROLLER_API APlayerCharacter : public APMChacter
 {
 	GENERATED_BODY()
 
@@ -37,12 +38,6 @@ public:
 private:
 	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UCameraComponent* FirstPersonCameraComp;
-
-	UPROPERTY(Category = "Player Mesh", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UStaticMeshComponent* MeshComp;
-
-	UPROPERTY(Category = "Player Collision", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UBoxComponent* CollisionBox;
 
 	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
 		float YawSensMultiplyer;

@@ -4,6 +4,7 @@
 
 #include "OnScreenDebugger.h"
 
+#include "GameFramework/Character.h"
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -18,9 +19,6 @@ class PLAYERCONTROLLER_API ARocket : public AActor
 	GENERATED_BODY()
 	
 private:
-	UPROPERTY(Category = "Rocket", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		float ExplosionRadius;
-
 	UPROPERTY(Category = "Rocket Mesh", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* MeshComp;
 	
@@ -30,6 +28,12 @@ private:
 	void Explode(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 protected:
+	UPROPERTY(Category = "Rocket", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float ExplosionRadius;
+
+	UPROPERTY(Category = "Rocket", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float RocketSpeed;
+
 	virtual void BeginPlay() override;
 
 public:	

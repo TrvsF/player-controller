@@ -14,15 +14,6 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& objectInitializer)
 	YawSensMultiplyer	= 0.4f;
 	PitchSensMultiplyer = 0.3f;
 
-	// player mesh
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
-	MeshComp->SetupAttachment(RootComponent);
-
-	// collsiion
-	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
-	CollisionBox->SetupAttachment(RootComponent);
-	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-
 	// movement
 	m_movementptr = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 }
