@@ -35,8 +35,5 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	inline void AddVeloicty(FVector Velocity)
-	{
-		MovementPointer->Velocity += Velocity;
-	}
+	virtual void AddVelocity(FVector Velocity);
 };

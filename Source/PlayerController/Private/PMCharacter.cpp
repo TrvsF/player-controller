@@ -26,3 +26,7 @@ void APMCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
+
+void APMCharacter::AddVelocity(FVector Velocity)
+{
+}

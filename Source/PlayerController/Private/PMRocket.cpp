@@ -39,12 +39,9 @@ void ARocket::EndPlay(const EEndPlayReason::Type EndPlayReason)
 			AActor* hitactor = hitresult.GetActor();
 			if (hitactor != nullptr)
 			{
-				OnScreenDebugger::DrawDebugMessage("rocket hit something", FColor::Red, 777);
 				// if actor is a character
 				if (APMCharacter* hitcharacter = Cast<APMCharacter>(hitactor))
 				{
-					OnScreenDebugger::DrawDebugMessage("rocket hit player", FColor::Red, 778);
-
 					FVector hitcharacterlocation = hitcharacter->GetActorLocation();	
 					FHitResult rockethitresult;
 
@@ -54,11 +51,9 @@ void ARocket::EndPlay(const EEndPlayReason::Type EndPlayReason)
 					// if actor is not blocked by a wall
 					if (!GetWorld()->LineTraceSingleByObjectType(rockethitresult, hitrocketlocation, hitcharacterlocation, objparams))
 					{
-						OnScreenDebugger::DrawDebugMessage("rocket can see player", FColor::Green, 779);
-						
 						// calc kockback
 						FVector knockback = { 0, 0, 10000.f };
-						hitcharacter->AddVeloicty(knockback);
+						hitcharacter->AddVelocity(knockback);
 					}
 				}
 			}

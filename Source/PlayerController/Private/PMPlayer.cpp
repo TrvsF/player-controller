@@ -112,3 +112,11 @@ void APMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("Yaw",   this, &APMPlayer::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Pitch", this, &APMPlayer::AddControllerPitchInput);
 }
+
+void APMPlayer::AddVelocity(FVector Velocity)
+{
+	if (MovementPointer)
+	{
+		MovementPointer->Velocity += {0, 0, 150.0f};
+	}
+}
