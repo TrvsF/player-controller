@@ -6,6 +6,7 @@ ARocket::ARocket()
 	ExplosionRadius = 400.0f;
 	RocketSpeed     = 3600.0f;
 	InitialLifeSpan = 5.0f;
+	KnockbackStrength = 50000.0f;
 
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -48,12 +49,24 @@ void ARocket::EndPlay(const EEndPlayReason::Type EndPlayReason)
 					FCollisionObjectQueryParams objparams = FCollisionObjectQueryParams(ECC_WorldStatic);
 					objparams.AddObjectTypesToQuery(ECC_WorldStatic);
 
-					// if actor is not blocked by a wall
+					// if actor is not blocked by ECC_WorldStatic
 					if (!GetWorld()->LineTraceSingleByObjectType(rockethitresult, hitrocketlocation, hitcharacterlocation, objparams))
 					{
 						FVector distancevector = hitcharacterlocation - hitrocketlocation;
-						FVector knockback = distancevector * -100.f;
-						hitcharacter->AddVelocity(knockback);
+						
+						float distance = distancevector.Size();
+						FVector normaliseddistancevector = distancevector.GetSafeNormal();
+						
+						FVector knockbackvector = normaliseddistancevector * (KnockbackStrength / distance);
+
+						FString kbmag = FString::SanitizeFloat(knockbackvector.Size());
+
+						OnScreenDebugger::DrawDebugMessage(knockbackvector.ToCompactString(), FColor::Cyan, -1);
+						OnScreenDebugger::DrawDebugMessage(kbmag, FColor::Cyan, -1);
+
+						hitcharacter->AddVelocity(knockbackvector);
+
+						return; // hack for player being in hitresults more than once TODO : fix
 					}
 				}
 			}

@@ -32,17 +32,20 @@ public:
 	UPROPERTY(Category = "Player Rocket", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<class ARocket> Rocket;
 
-private:
-	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UCameraComponent* FirstPersonCameraComp;
-
-	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
+	UPROPERTY(Category = "Player View", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
 		float YawSensMultiplyer;
 
-	UPROPERTY(Category = "Player Camera", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
+	UPROPERTY(Category = "Player View", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
 		float PitchSensMultiplyer;
 
-	FVector m_movementvector;
+	UPROPERTY(Category = "Player View", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UCameraComponent* FirstPersonCameraComp;
+	
+	UPROPERTY(Category = "Player View", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UStaticMeshComponent* FirstPersonViewmodel;
+
+private:
+	FVector MovementVector;
 
 protected:
 	virtual void BeginPlay() override;

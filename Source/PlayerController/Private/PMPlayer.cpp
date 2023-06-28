@@ -13,12 +13,16 @@ APMPlayer::APMPlayer(const FObjectInitializer& objectInitializer)
 	FirstPersonCameraComp->bUsePawnControlRotation = true;
 	YawSensMultiplyer	= 0.4f;
 	PitchSensMultiplyer = 0.3f;
+
+	// viewmodel
+	FirstPersonViewmodel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Viewmodel"));
+	FirstPersonViewmodel->SetupAttachment(FirstPersonCameraComp);
 }
 
 FVector APMPlayer::GetWishDir() const
 {
-	const auto& f = GetActorForwardVector() * m_movementvector.X;
-	const auto& r = GetActorRightVector()   * m_movementvector.Y;
+	const auto& f = GetActorForwardVector() * MovementVector.X;
+	const auto& r = GetActorRightVector()   * MovementVector.Y;
 
 	return f + r;
 }
@@ -69,7 +73,7 @@ void APMPlayer::Move(float Value)
 {
 	if (Controller)
 	{
-		m_movementvector.X = Value;
+		MovementVector.X = Value;
 	}
 }
 
@@ -77,7 +81,7 @@ void APMPlayer::Strafe(float Value)
 {
 	if (Controller)
 	{
-		m_movementvector.Y = Value;
+		MovementVector.Y = Value;
 	}
 }
 

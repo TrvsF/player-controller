@@ -26,6 +26,9 @@ private:
 	UPROPERTY(Category = "Rocket Movement", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UProjectileMovementComponent* ProjectileMovementComp;
 
+	UPROPERTY(Category = "Viewmodel Mesh", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UStaticMeshComponent* ViewmodelMesh;
+
 	void Explode(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 protected:
@@ -34,6 +37,9 @@ protected:
 
 	UPROPERTY(Category = "Rocket", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float RocketSpeed;
+
+	UPROPERTY(Category = "Rocket", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float KnockbackStrength;
 
 	virtual void BeginPlay() override;
 

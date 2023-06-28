@@ -5,7 +5,7 @@ APMCharacter::APMCharacter(const FObjectInitializer& objectInitializer)
  	PrimaryActorTick.bCanEverTick = true;
 
 	// mesh
-	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Character Mesh"));
 	MeshComp->SetupAttachment(RootComponent);
 
 	// collsiion
