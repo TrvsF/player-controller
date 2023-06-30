@@ -3,9 +3,6 @@
 APMPlayer::APMPlayer(const FObjectInitializer& objectInitializer)
 	: Super(objectInitializer.SetDefaultSubobjectClass<UPlayerMovement>(ACharacter::CharacterMovementComponentName))
 {
- 	// tick every frame
-	PrimaryActorTick.bCanEverTick = true;
-
 	// camera
 	FirstPersonCameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComp->SetupAttachment(RootComponent);
@@ -17,14 +14,6 @@ APMPlayer::APMPlayer(const FObjectInitializer& objectInitializer)
 	// viewmodel
 	FirstPersonViewmodel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Viewmodel"));
 	FirstPersonViewmodel->SetupAttachment(FirstPersonCameraComp);
-}
-
-FVector APMPlayer::GetWishDir() const
-{
-	const auto& f = GetActorForwardVector() * MovementVector.X;
-	const auto& r = GetActorRightVector()   * MovementVector.Y;
-
-	return f + r;
 }
 
 void APMPlayer::Shoot()
@@ -89,12 +78,6 @@ void APMPlayer::Strafe(float Value)
 void APMPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	// tick movement
-	if (MovementPointer)
-	{
-		MovementPointer->UpdateWishDir(GetWishDir());
-		MovementPointer->TickComponent(DeltaTime, LEVELTICK_All, NULL);
-	}
 
 	// debug
 	const auto& PositionStr = GetActorLocation().ToCompactString();
@@ -115,12 +98,4 @@ void APMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("StrafeRight", this, &APMPlayer::Strafe);
 	PlayerInputComponent->BindAxis("Yaw",   this, &APMPlayer::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Pitch", this, &APMPlayer::AddControllerPitchInput);
-}
-
-void APMPlayer::AddVelocity(FVector Velocity)
-{
-	if (MovementPointer)
-	{
-		MovementPointer->Velocity += Velocity;
-	}
 }

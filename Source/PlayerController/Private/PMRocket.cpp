@@ -65,8 +65,6 @@ void ARocket::EndPlay(const EEndPlayReason::Type EndPlayReason)
 						OnScreenDebugger::DrawDebugMessage(kbmag, FColor::Cyan, -1);
 
 						hitcharacter->AddVelocity(knockbackvector);
-
-						return; // hack for player being in hitresults more than once TODO : fix
 					}
 				}
 			}

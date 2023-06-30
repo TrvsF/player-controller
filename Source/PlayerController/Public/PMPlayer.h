@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,7 +6,6 @@
 #include "PMRocket.h"
 #include "OnScreenDebugger.h"
 
-#include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 
 #include "Components/BoxComponent.h"
@@ -27,8 +24,6 @@ class PLAYERCONTROLLER_API APMPlayer : public APMCharacter
 public:
 	APMPlayer(const FObjectInitializer& objectInitializer);
 
-	FVector GetWishDir() const;
-
 	UPROPERTY(Category = "Player Rocket", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<class ARocket> Rocket;
 
@@ -44,8 +39,11 @@ public:
 	UPROPERTY(Category = "Player View", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		UStaticMeshComponent* FirstPersonViewmodel;
 
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 private:
-	FVector MovementVector;
+	
 
 protected:
 	virtual void BeginPlay() override;
@@ -57,9 +55,4 @@ protected:
 
 	void AddControllerYawInput  (float Value) override;
 	void AddControllerPitchInput(float Value) override;
-
-public:	
-	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void AddVelocity(FVector Velocity) override;
 };

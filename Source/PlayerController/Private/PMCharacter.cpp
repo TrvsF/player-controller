@@ -17,6 +17,14 @@ APMCharacter::APMCharacter(const FObjectInitializer& objectInitializer)
 	MovementPointer = Cast<UPlayerMovement>(ACharacter::GetMovementComponent());
 }
 
+FVector APMCharacter::GetWishDir() const
+{
+	const auto& f = GetActorForwardVector() * MovementVector.X;
+	const auto& r = GetActorRightVector() * MovementVector.Y;
+
+	return f + r;
+}
+
 void APMCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -25,8 +33,19 @@ void APMCharacter::BeginPlay()
 void APMCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// tick movement
+	if (MovementPointer)
+	{
+		MovementPointer->UpdateWishDir(GetWishDir());
+		MovementPointer->TickComponent(DeltaTime, LEVELTICK_All, NULL);
+	}
 }
 
 void APMCharacter::AddVelocity(FVector Velocity)
 {
+	if (MovementPointer)
+	{
+		MovementPointer->Velocity += Velocity;
+	}
 }
