@@ -26,21 +26,13 @@ void UPlayerMovement::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		more work needs to go into looking at how events work, as i think they drive 
 		the movement componant
 	*/
-
-	// debug
-	FString velstr = FString::SanitizeFloat(Velocity.Size2D());
-	OnScreenDebugger::DrawDebugMessage("vel: " + velstr, FColor::White, 100);
-	OnScreenDebugger::DrawDebugMessage("onground", IsMovingOnGround(), 101);
 }
 
 void UPlayerMovement::TickVelocity(float delta)
 {
 	// TODO : shit hack
 	if (m_tickcheck) 
-	{
-		OnScreenDebugger::DrawDebugMessage("tc", FColor::Red, 102);
-		return; 
-	}
+	{ return; }
 	m_tickcheck = true;
 
 	// tick velocity
@@ -58,7 +50,6 @@ void UPlayerMovement::UpdateVelocity(FVector moveadd)
 {
 	// debug
 	const auto& addstr = FString::SanitizeFloat(moveadd.Size2D());
-	OnScreenDebugger::DrawDebugMessage("addspeed: " + addstr, FColor::Green, 103);
 
 	// onground differences
 	bool onground = IsMovingOnGround();
@@ -77,9 +68,6 @@ void UPlayerMovement::UpdateVelocity(FVector moveadd)
 		// clamps the vel to the max speed
 		float maxadd = maxspeed - Velocity.Size2D();
 		Velocity += moveadd.GetClampedToMaxSize2D(maxadd);
-
-		// more debug
-		OnScreenDebugger::DrawDebugMessage("clamped", FColor::Green, 104);
 	}
 }
 

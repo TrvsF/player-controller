@@ -84,6 +84,8 @@ void APMPlayer::Tick(float DeltaTime)
 	OnScreenDebugger::DrawDebugMessage("pos: " + PositionStr, FColor::White, 0);
 	const auto& WishStr = GetWishDir().ToCompactString();
 	OnScreenDebugger::DrawDebugMessage("wishdir: " + WishStr, FColor::White, 1);
+	const auto& velstr = FString::SanitizeFloat(MovementPointer->Velocity.Size2D());
+	OnScreenDebugger::DrawDebugMessage("vel: " + velstr, FColor::White, 2);
 }
 
 // called to bind functionality to input

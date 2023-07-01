@@ -10,17 +10,15 @@ class PLAYERCONTROLLER_API APMArtificalBody : public APMCharacter
 	GENERATED_BODY()
 
 public:
-	// APMArtificalBody(const FObjectInitializer& objectInitializer);
-
-	// FVector GetWishDir() const;
+	APMArtificalBody(const FObjectInitializer& objectInitializer);
 
 	// virtual void Tick(float DeltaTime) override;
-	// virtual void AddVelocity(FVector Velocity) override;
 
+	void LookAtPos(FVector targetpos);
 private:
-	FVector MovementVector;
+
 
 protected:
-	// virtual void BeginPlay() override;
+	virtual void BeginPlay() override;
 
 };

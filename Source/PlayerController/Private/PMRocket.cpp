@@ -60,7 +60,6 @@ void ARocket::EndPlay(const EEndPlayReason::Type EndPlayReason)
 						FVector knockbackvector = normaliseddistancevector * (KnockbackStrength / distance);
 
 						FString kbmag = FString::SanitizeFloat(knockbackvector.Size());
-
 						OnScreenDebugger::DrawDebugMessage(knockbackvector.ToCompactString(), FColor::Cyan, -1);
 						OnScreenDebugger::DrawDebugMessage(kbmag, FColor::Cyan, -1);
 
@@ -98,5 +97,5 @@ void ARocket::BeginPlay()
 	MeshComp->OnComponentHit.AddDynamic(this, &ARocket::Explode);
 
 	// debug
-	OnScreenDebugger::DrawDebugMessage("spawned rocket from rocket", FColor::Green, -1);
+	OnScreenDebugger::DrawDebugMessage("spawned rocket", FColor::Green, -1);
 }
