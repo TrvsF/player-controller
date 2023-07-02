@@ -22,7 +22,7 @@ void APMPlayer::Shoot()
 	if (World)
 	{
 		float distancefromplayer = 150.f;
-		FVector SpawnLocation = GetActorLocation() + GetActorForwardVector() * distancefromplayer;
+		FVector SpawnLocation  = FirstPersonCameraComp->GetComponentLocation() + GetActorForwardVector() * distancefromplayer;
 		FRotator SpawnRotation = FirstPersonCameraComp->GetComponentRotation();
 
 		ARocket* SpawnedProjectile = World->SpawnActor<ARocket>(Rocket, SpawnLocation, SpawnRotation);
