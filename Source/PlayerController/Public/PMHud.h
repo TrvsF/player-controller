@@ -11,6 +11,13 @@ class PLAYERCONTROLLER_API APMHud : public AHUD
 {
 	GENERATED_BODY()
 public:
+	APMHud();
+
+	UPROPERTY(Category = "XHair", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
+		int XHairSize;
+
+	UPROPERTY(Category = "XHair", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
+		int XHairThickness;
 private:
 protected:
 	virtual void DrawHUD() override;

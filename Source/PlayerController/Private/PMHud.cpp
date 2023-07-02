@@ -1,19 +1,21 @@
 #include "PMHud.h"
 
+APMHud::APMHud()
+{
+    XHairSize = 5;
+    XHairThickness = 1;
+}
+
 void APMHud::DrawHUD()
 {
     Super::DrawHUD();
 
-    // Calculate the center of the screen
-    FVector2D ScreenCenter(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
+    if (Canvas == nullptr)
+    { return; }
 
-    // Set the crosshair size and thickness
-    int32 CrosshairSize = 5;
-    int32 CrosshairThickness = 1;
+    FVector2D centrevec = { Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f };
 
-    // Draw horizontal line of the crosshair
-    DrawLine(ScreenCenter.X - CrosshairSize, ScreenCenter.Y, ScreenCenter.X + CrosshairSize, ScreenCenter.Y, FLinearColor::White, CrosshairThickness);
-
-    // Draw vertical line of the crosshair
-    DrawLine(ScreenCenter.X, ScreenCenter.Y - CrosshairSize, ScreenCenter.X, ScreenCenter.Y + CrosshairSize, FLinearColor::White, CrosshairThickness);
+    // draw cross
+    DrawLine(centrevec.X - XHairSize, centrevec.Y, centrevec.X + XHairSize, centrevec.Y, FLinearColor::White, XHairThickness);
+    DrawLine(centrevec.X, centrevec.Y - XHairSize, centrevec.X, centrevec.Y + XHairSize, FLinearColor::White, XHairThickness);
 }
