@@ -8,6 +8,13 @@ OnScreenDebugger::~OnScreenDebugger()
 {
 }
 
+void OnScreenDebugger::DrawDebugMessage(char* message)
+{
+	const auto& fstring = FString(message);
+
+	DrawDebugMessage(fstring, FColor::Green, -1);
+}
+
 void OnScreenDebugger::DrawDebugMessage(char* message, bool boolean, int id)
 {
 	const auto& colour = boolean ? FColor::Green : FColor::Red;

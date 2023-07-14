@@ -2,8 +2,22 @@
 
 APMHud::APMHud()
 {
-    XHairSize = 3;
+    XHairSize = 8;
     XHairThickness = 2;
+    
+    scaleoffset = 1.0f;
+}
+
+void APMHud::Tick(float DeltaTime)
+{
+    if (scaleoffset == 1.0f)
+    { return; }
+
+    const auto& shrinkfactor = 0.5f;
+    
+
+    if (scaleoffset < 1.0f)
+    { scaleoffset = 1.0f; }
 }
 
 void APMHud::DrawCircle(FVector2D pos, float radius, FLinearColor colour)
@@ -53,18 +67,24 @@ void APMHud::DrawCircle(float posx, float posy, float radius, FLinearColor colou
     }
 }
 
+void APMHud::DrawXHair()
+{
+    FVector2D centrevec = { Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f };
+
+    // x
+    DrawLine(centrevec.X - XHairSize, centrevec.Y, centrevec.X + XHairSize, centrevec.Y, FLinearColor::White, XHairThickness);
+    DrawLine(centrevec.X, centrevec.Y - XHairSize, centrevec.X, centrevec.Y + XHairSize, FLinearColor::White, XHairThickness);
+
+    // o
+    // DrawCircle(centrevec, XHairSize * scaleoffset, FLinearColor::White);
+}
+
 void APMHud::DrawHUD()
 {
     Super::DrawHUD();
 
     if (Canvas == nullptr)
-    { return; }
+    { return; }  
 
-    FVector2D centrevec = { Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f };
-
-    // draw cross
-    DrawLine(centrevec.X - XHairSize, centrevec.Y, centrevec.X + XHairSize, centrevec.Y, FLinearColor::White, XHairThickness);
-    DrawLine(centrevec.X, centrevec.Y - XHairSize, centrevec.X, centrevec.Y + XHairSize, FLinearColor::White, XHairThickness);
-
-    DrawCircle(centrevec, 12.0f, FLinearColor::White);
+    DrawXHair();
 }

@@ -17,10 +17,13 @@ APMPlayer::APMPlayer(const FObjectInitializer& objectInitializer)
 }
 
 void APMPlayer::Shoot()
+
 {
 	UWorld* World = GetWorld();
 	if (World)
 	{
+		// calculate rocket spawnpoint
+		// TODO : this offsets the rocket in such a way that it drifts from the player's xhair relative to pitch
 		float distancefromplayer = 150.f;
 		FVector SpawnLocation  = FirstPersonCameraComp->GetComponentLocation() + GetActorForwardVector() * distancefromplayer;
 		FRotator SpawnRotation = FirstPersonCameraComp->GetComponentRotation();
