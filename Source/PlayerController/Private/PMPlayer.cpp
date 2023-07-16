@@ -14,10 +14,11 @@ APMPlayer::APMPlayer(const FObjectInitializer& objectInitializer)
 	// viewmodel
 	FirstPersonViewmodel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Viewmodel"));
 	FirstPersonViewmodel->SetupAttachment(FirstPersonCameraComp);
+
+	Weapon = CreateDefaultSubobject<APMWeapon>(TEXT("Weapon"));
 }
 
 void APMPlayer::Shoot()
-
 {
 	UWorld* World = GetWorld();
 	if (World)
@@ -28,12 +29,16 @@ void APMPlayer::Shoot()
 		FVector SpawnLocation  = FirstPersonCameraComp->GetComponentLocation() + GetActorForwardVector() * distancefromplayer;
 		FRotator SpawnRotation = FirstPersonCameraComp->GetComponentRotation();
 
+		Weapon->Shoot(SpawnLocation, SpawnRotation);
+
+		/*
 		ARocket* SpawnedProjectile = World->SpawnActor<ARocket>(Rocket, SpawnLocation, SpawnRotation);
 
 		if (SpawnedProjectile)
 		{
 			OnScreenDebugger::DrawDebugMessage("fired", FColor::Green, -1);
 		}
+		*/
 	}
 }
 

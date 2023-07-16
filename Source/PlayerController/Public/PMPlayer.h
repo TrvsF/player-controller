@@ -5,6 +5,7 @@
 #include "PMCharacter.h"
 #include "PMRocket.h"
 #include "OnScreenDebugger.h"
+#include "PMWeapon.h"
 
 #include "GameFramework/Controller.h"
 
@@ -24,8 +25,11 @@ class PLAYERCONTROLLER_API APMPlayer : public APMCharacter
 public:
 	APMPlayer(const FObjectInitializer& objectInitializer);
 
-	UPROPERTY(Category = "Player Rocket", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(Category = "Player Weapon", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<class ARocket> Rocket;
+
+	UPROPERTY(Category = "Player Weapon", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		APMWeapon* Weapon;
 
 	UPROPERTY(Category = "Player View", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
 		float YawSensMultiplyer;
