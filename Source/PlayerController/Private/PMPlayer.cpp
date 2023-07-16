@@ -29,16 +29,8 @@ void APMPlayer::Shoot()
 		FVector SpawnLocation  = FirstPersonCameraComp->GetComponentLocation() + GetActorForwardVector() * distancefromplayer;
 		FRotator SpawnRotation = FirstPersonCameraComp->GetComponentRotation();
 
+		// shoot from weapon
 		Weapon->Shoot(SpawnLocation, SpawnRotation);
-
-		/*
-		ARocket* SpawnedProjectile = World->SpawnActor<ARocket>(Rocket, SpawnLocation, SpawnRotation);
-
-		if (SpawnedProjectile)
-		{
-			OnScreenDebugger::DrawDebugMessage("fired", FColor::Green, -1);
-		}
-		*/
 	}
 }
 
