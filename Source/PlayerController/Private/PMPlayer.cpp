@@ -15,7 +15,8 @@ APMPlayer::APMPlayer(const FObjectInitializer& objectInitializer)
 	FirstPersonViewmodel = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Viewmodel"));
 	FirstPersonViewmodel->SetupAttachment(FirstPersonCameraComp);
 
-	Weapon = CreateDefaultSubobject<APMWeapon>(TEXT("Weapon"));
+	Weapon = APMWeapon::StaticClass();
+	// Weapon = CreateDefaultSubobject<APMWeapon>(TEXT("Weapon"));
 }
 
 void APMPlayer::Shoot()
@@ -30,7 +31,7 @@ void APMPlayer::Shoot()
 		FRotator SpawnRotation = FirstPersonCameraComp->GetComponentRotation();
 
 		// shoot from weapon
-		Weapon->Shoot(SpawnLocation, SpawnRotation);
+		WeaponObject->Shoot(SpawnLocation, SpawnRotation);
 	}
 }
 
@@ -56,6 +57,12 @@ void APMPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	OnScreenDebugger::DrawDebugMessage("spawned player", FColor::Green, -1);
+
+	// spawn weapon object
+	if (Weapon)
+	{
+		WeaponObject = GetWorld()->SpawnActor<APMWeapon>(Weapon, GetActorLocation(), GetActorRotation());
+	}
 }
 
 void APMPlayer::Move(float Value)

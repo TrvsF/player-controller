@@ -29,7 +29,9 @@ public:
 		TSubclassOf<class ARocket> Rocket;
 
 	UPROPERTY(Category = "Player Weapon", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		APMWeapon* Weapon;
+		TSubclassOf<class APMWeapon> Weapon;
+	UPROPERTY()
+		APMWeapon* WeaponObject;
 
 	UPROPERTY(Category = "Player View", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
 		float YawSensMultiplyer;
