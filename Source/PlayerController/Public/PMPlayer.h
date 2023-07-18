@@ -55,6 +55,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Shoot();
+	void Reload();
 	void Jump() override;
 	void Move  (float Value);
 	void Strafe(float Value);

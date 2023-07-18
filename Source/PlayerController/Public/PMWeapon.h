@@ -29,25 +29,22 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	// virtual void Shoot(FVector location, FRotator rotation) {}
-	// debug
-	void Shoot(FVector location, FRotator rotation)
-	{
-		UWorld* World = GetWorld();
-		if (World)
-		{
-			OnScreenDebugger::DrawDebugMessage("shooted");
-			ARocket* SpawnedProjectile = World->SpawnActor<ARocket>(Projectile, location, rotation);
-			if (SpawnedProjectile)
-			{
-				OnScreenDebugger::DrawDebugMessage("fired");
-			}
-		}
-	}
+	void Shoot(FVector origin, FRotator rotation);
+	virtual void ShootHitscan(FVector origin, FRotator rotation) {}
+	virtual void ShootProjectile(FVector origin, FRotator rotation) {}
+
+	void Reload();
 
 private:
+	// meta-data on the weapon
 	EWeaponType WeaponType;
+	EWeaponReloadType WeaponReloadType;
+	EWeaponShootType WeaponShootType;
 	int magsize;
+
+	// reloading
+	bool isreloading;
+	float remainingreloadtime;
 
 	inline bool CanShoot()
 	{ return magsize > 0; }

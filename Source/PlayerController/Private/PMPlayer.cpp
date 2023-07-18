@@ -35,6 +35,11 @@ void APMPlayer::Shoot()
 	}
 }
 
+void APMPlayer::Reload()
+{
+	WeaponObject->Reload();
+}
+
 void APMPlayer::Jump()
 {
 	MovementPointer->DoJump(false);
@@ -101,8 +106,9 @@ void APMPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// TODO : replace with the new UE5 shit
-	PlayerInputComponent->BindAction("Jump",  IE_Pressed,  this, &APMPlayer::Jump);
-	PlayerInputComponent->BindAction("Shoot", IE_Pressed,  this, &APMPlayer::Shoot);
+	PlayerInputComponent->BindAction("Jump",   IE_Pressed,  this, &APMPlayer::Jump);
+	PlayerInputComponent->BindAction("Shoot",  IE_Pressed,  this, &APMPlayer::Shoot);
+	PlayerInputComponent->BindAction("Reload", IE_Pressed,  this, &APMPlayer::Reload);
 	PlayerInputComponent->BindAxis("MoveForward", this, &APMPlayer::Move);
 	PlayerInputComponent->BindAxis("StrafeRight", this, &APMPlayer::Strafe);
 	PlayerInputComponent->BindAxis("Yaw",   this, &APMPlayer::AddControllerYawInput);
