@@ -4,6 +4,10 @@ APMHud::APMHud()
 {
     XHairSize = 8;
     XHairThickness = 2;
+    XHairGap = 2;
+
+    drawcircle = false;
+    drawcross = true;
     
     scaleoffset = 1.0f;
 }
@@ -72,11 +76,22 @@ void APMHud::DrawXHair()
     FVector2D centrevec = { Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f };
 
     // x
-    DrawLine(centrevec.X - XHairSize, centrevec.Y, centrevec.X + XHairSize, centrevec.Y, FLinearColor::White, XHairThickness);
-    DrawLine(centrevec.X, centrevec.Y - XHairSize, centrevec.X, centrevec.Y + XHairSize, FLinearColor::White, XHairThickness);
+    if (drawcross)
+    {
+        // h
+        DrawLine(centrevec.X - XHairSize, centrevec.Y, centrevec.X - XHairGap * 2, centrevec.Y, FLinearColor::White, XHairThickness);
+        DrawLine(centrevec.X + XHairGap * 2, centrevec.Y, centrevec.X + XHairSize, centrevec.Y, FLinearColor::White, XHairThickness);
+        // v
+        DrawLine(centrevec.X, centrevec.Y - XHairSize, centrevec.X, centrevec.Y - XHairGap * 2, FLinearColor::White, XHairThickness);
+        DrawLine(centrevec.X, centrevec.Y + XHairGap * 2, centrevec.X, centrevec.Y + XHairSize, FLinearColor::White, XHairThickness);
+    }
+    
 
     // o
-    // DrawCircle(centrevec, XHairSize * scaleoffset, FLinearColor::White);
+    if (drawcircle)
+    {
+        DrawCircle(centrevec, XHairGap * scaleoffset, FLinearColor::White);
+    }
 }
 
 void APMHud::DrawHUD()

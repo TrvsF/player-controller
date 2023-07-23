@@ -19,8 +19,15 @@ public:
 	UPROPERTY(Category = "XHair", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
 		int XHairThickness;
 
+	UPROPERTY(Category = "XHair", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true", ClampMin = "0", UIMin = "0"))
+		int XHairGap;
+
 	virtual void Tick(float DeltaTime) override;
+
+
 private:
+	bool drawcircle;
+	bool drawcross;
 	float scaleoffset;
 
 	void DrawCircle(FVector2D pos, float radius, FLinearColor colour);
