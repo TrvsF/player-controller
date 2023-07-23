@@ -10,7 +10,7 @@ void APMGamemode::StartPlay()
 	Super::StartPlay();
 }
 
-void APMGamemode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+void APMGamemode::HandleStartingNewPlayer_Implementation(ATowerDefence* NewPlayer)
 {
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }

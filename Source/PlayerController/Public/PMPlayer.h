@@ -18,7 +18,7 @@
 #include "PMPlayer.generated.h"
 
 UCLASS()
-class PLAYERCONTROLLER_API APMPlayer : public APMCharacter
+class TowerDefence_API APMPlayer : public APMCharacter
 {
 	GENERATED_BODY()
 

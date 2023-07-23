@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class PlayerController : ModuleRules
+public class TowerDefence : ModuleRules
 {
-	public PlayerController(ReadOnlyTargetRules Target) : base(Target)
+	public TowerDefence(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	

@@ -5,7 +5,7 @@
 #include "PMArtificalBody.generated.h"
 
 UCLASS()
-class PLAYERCONTROLLER_API APMArtificalBody : public APMCharacter
+class TowerDefence_API APMArtificalBody : public APMCharacter
 {
 	GENERATED_BODY()
 

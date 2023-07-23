@@ -11,7 +11,7 @@
 #include "PMWeapon.generated.h"
 
 UCLASS()
-class PLAYERCONTROLLER_API APMWeapon : public AActor
+class TowerDefence_API APMWeapon : public AActor
 {
 	GENERATED_BODY()
 

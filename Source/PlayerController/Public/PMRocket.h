@@ -15,7 +15,7 @@
 #include "PMRocket.generated.h"
 
 UCLASS()
-class PLAYERCONTROLLER_API ARocket : public AActor
+class TowerDefence_API ARocket : public AActor
 {
 	GENERATED_BODY()
 	

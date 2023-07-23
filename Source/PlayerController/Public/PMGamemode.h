@@ -7,7 +7,7 @@
 #include "PMGamemode.generated.h"
 
 UCLASS()
-class PLAYERCONTROLLER_API APMGamemode : public AGameModeBase
+class TowerDefence_API APMGamemode : public AGameModeBase
 {
 	GENERATED_BODY()
 
@@ -15,5 +15,5 @@ public:
 	APMGamemode();
 
 	virtual void StartPlay() override;
-	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+	virtual void HandleStartingNewPlayer_Implementation(ATowerDefence* NewPlayer) override;
 };

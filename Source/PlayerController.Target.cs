@@ -3,13 +3,13 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class PlayerControllerTarget : TargetRules
+public class TowerDefenceTarget : TargetRules
 {
-	public PlayerControllerTarget( TargetInfo Target) : base(Target)
+	public TowerDefenceTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_2;
-		ExtraModuleNames.Add("PlayerController");
+		ExtraModuleNames.Add("TowerDefence");
 	}
 }

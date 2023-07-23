@@ -7,7 +7,7 @@
 #include "PMHud.generated.h"
 
 UCLASS()
-class PLAYERCONTROLLER_API APMHud : public AHUD
+class TowerDefence_API APMHud : public AHUD
 {
 	GENERATED_BODY()
 public:

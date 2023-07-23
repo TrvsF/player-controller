@@ -14,7 +14,7 @@
 class UPlayerMovement;
 
 UCLASS()
-class PLAYERCONTROLLER_API APMCharacter : public ACharacter
+class TowerDefence_API APMCharacter : public ACharacter
 {
 	GENERATED_BODY()
 

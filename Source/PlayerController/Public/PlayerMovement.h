@@ -16,7 +16,7 @@
  * does all movement calculations
  */
 UCLASS()
-class PLAYERCONTROLLER_API UPlayerMovement : public UCharacterMovementComponent
+class TowerDefence_API UPlayerMovement : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
 	

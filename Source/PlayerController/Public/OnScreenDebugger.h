@@ -7,7 +7,7 @@
 /**
  * 
  */
-class PLAYERCONTROLLER_API OnScreenDebugger
+class TowerDefence_API OnScreenDebugger
 {
 public:
 	OnScreenDebugger();
